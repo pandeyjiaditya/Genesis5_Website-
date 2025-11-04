@@ -1,3 +1,4 @@
+// ...existing code...
 import React from "react";
 
 // Image assets
@@ -24,7 +25,7 @@ function App() {
     width: 0,
   });
   const [isVisible, setIsVisible] = React.useState({
-    hero: false,
+    home: false,
     about: false,
     prizes: false,
     memories: false,
@@ -39,67 +40,86 @@ function App() {
   });
 
   React.useEffect(() => {
-    // Trigger hero animation on mount
+    // trigger hero on mount
     setTimeout(() => {
-      setIsVisible((prev) => ({ ...prev, hero: true }));
+      setIsVisible((prev) => ({ ...prev, home: true }));
     }, 100);
 
-    // Intersection Observer for scroll animations
+    // Intersection Observer for enter/leave animations
     const observerOptions = {
-      threshold: 0.2,
-      rootMargin: "0px 0px -100px 0px",
+      threshold: 0.35,
+      rootMargin: "0px 0px -10% 0px",
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const sectionId = entry.target.id;
-          setIsVisible((prev) => ({ ...prev, [sectionId]: true }));
-        }
+        const id = entry.target.id;
+        if (!id) return;
+        // toggle visibility based on intersection (enter = true, leave = false)
+        setIsVisible((prev) => ({ ...prev, [id]: entry.isIntersecting }));
       });
     }, observerOptions);
 
-    // Observe all sections
-    const sections = ["about", "prizes", "memories", "faqs"];
-    sections.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
+    const sectionsToObserve = ["home", "about", "prizes", "memories", "faqs"];
+    sectionsToObserve.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
   }, []);
 
-  // Update active section based on scroll position
+  // Update active section based on viewport midpoint
   React.useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "about", "memories", "faqs"];
-      const scrollPosition = window.scrollY + window.innerHeight / 3;
+      const sections = ["home", "about", "prizes", "memories", "faqs"];
+      const viewportMid = window.scrollY + window.innerHeight / 2;
+      let current = "home";
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = document.getElementById(sections[i]);
-        if (section) {
-          const sectionTop = section.offsetTop;
-          if (scrollPosition >= sectionTop) {
-            setActiveSection(sections[i]);
-            break;
-          }
+      for (let i = 0; i < sections.length; i++) {
+        const el = document.getElementById(sections[i]);
+        if (!el) continue;
+        const rectTop = el.offsetTop;
+        const rectBottom = rectTop + el.offsetHeight;
+        if (viewportMid >= rectTop && viewportMid < rectBottom) {
+          current = sections[i];
+          break;
         }
+      }
+
+      setActiveSection((prev) => (prev !== current ? current : prev));
+    };
+
+    // run once
+    handleScroll();
+    const throttled = () => {
+      // cheap throttle using requestAnimationFrame
+      if (
+        typeof handleScroll.__ticking === "undefined" ||
+        !handleScroll.__ticking
+      ) {
+        handleScroll.__ticking = true;
+        requestAnimationFrame(() => {
+          handleScroll();
+          handleScroll.__ticking = false;
+        });
       }
     };
 
-    // Call once on mount
-    handleScroll();
-
-    // Add scroll listener
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", throttled, { passive: true });
+    window.addEventListener("resize", throttled);
+    return () => {
+      window.removeEventListener("scroll", throttled);
+      window.removeEventListener("resize", throttled);
+    };
   }, []);
 
-  // Update underline position
+  // Update underline position when activeSection changes
   React.useEffect(() => {
     const updateUnderline = () => {
       const activeRef = navRefs.current[activeSection];
       if (activeRef) {
+        // offsetLeft relative to positioned parent — nav wrapper is positioned relative
         const { offsetLeft, offsetWidth } = activeRef;
         setUnderlineStyle({
           left: offsetLeft,
@@ -118,6 +138,7 @@ function App() {
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
       setMobileMenuOpen(false);
+      // activeSection will update from scroll handler (keeps sync)
     }
   };
 
@@ -202,7 +223,7 @@ function App() {
 
             {/* Sliding Underline */}
             <div
-              className="absolute bottom-0 h-[2px] transition-all duration-500 ease-out"
+              className="absolute bottom-0 h-[2px] transition-all duration-400 ease-out"
               style={{
                 left: `${underlineStyle.left}px`,
                 width: `${underlineStyle.width}px`,
@@ -277,7 +298,7 @@ function App() {
           {/* Background Image */}
           <div
             className={`absolute right-0 top-0 w-[200px] h-[280px] sm:w-[300px] sm:h-[420px] md:w-[400px] md:h-[560px] lg:w-[636px] lg:h-[889px] opacity-50 sm:opacity-75 lg:opacity-100 transition-all duration-1000 ${
-              isVisible.hero
+              isVisible.home
                 ? "translate-x-0 opacity-100"
                 : "translate-x-full opacity-0"
             }`}
@@ -293,7 +314,7 @@ function App() {
           <div className="relative z-10 pt-8 sm:pt-16 lg:pt-32">
             <div
               className={`flex flex-col sm:flex-row items-start sm:items-center transition-all duration-1000 delay-300 ${
-                isVisible.hero
+                isVisible.home
                   ? "translate-x-0 opacity-100"
                   : "-translate-x-full opacity-0"
               }`}
@@ -314,7 +335,7 @@ function App() {
 
             <p
               className={`text-base sm:text-xl md:text-2xl lg:text-[32px] mt-4 sm:mt-6 lg:mt-8 max-w-xl transition-all duration-1000 delay-500 ${
-                isVisible.hero
+                isVisible.home
                   ? "translate-y-0 opacity-100"
                   : "translate-y-10 opacity-0"
               }`}
@@ -325,7 +346,7 @@ function App() {
 
             <button
               className={`mt-8 sm:mt-12 lg:mt-16 bg-[#0f79c4] text-white text-lg sm:text-2xl lg:text-4xl px-8 sm:px-12 lg:px-14 py-3 sm:py-4 lg:py-5 rounded-xl lg:rounded-2xl hover:bg-[#0d6aac] hover:scale-105 transition-all duration-300 delay-700 ${
-                isVisible.hero
+                isVisible.home
                   ? "translate-y-0 opacity-100"
                   : "translate-y-10 opacity-0"
               }`}
@@ -557,7 +578,7 @@ function App() {
                   ? "translate-y-0 opacity-100"
                   : "translate-y-20 opacity-0"
               }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
+              style={{ transitionDelay: `${index * 80}ms` }}
             >
               {/* Placeholder for images */}
             </div>
@@ -593,3 +614,4 @@ function App() {
 }
 
 export default App;
+// ...existing code...
