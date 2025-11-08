@@ -1,11 +1,7 @@
-// ...existing code...
 import React from "react";
+import "./index.css";
 
-// Image assets
-const heroImage =
-  "https://www.figma.com/api/mcp/asset/f5385f31-fa9d-4762-aca6-dc1a5103b80a";
-const aboutImage =
-  "https://www.figma.com/api/mcp/asset/d417f6db-71dd-4bc8-b8ea-6b3c731bc4db";
+const aboutImage = "/character1.png";
 const navUnderline =
   "https://www.figma.com/api/mcp/asset/ae47c3ad-dcb5-41f3-b627-8ed9b43ffbed";
 const prize1Badge =
@@ -17,7 +13,19 @@ const prize2Circle =
 const prize3Circle =
   "https://www.figma.com/api/mcp/asset/57702666-5ebf-4b0c-8216-57d367d93a7e";
 
-function App() {
+// Pokemon images
+const pikachu =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png";
+const bulbasaur =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png";
+const charmander =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png";
+const squirtle =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png";
+const snorlax =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png";
+
+export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState("home");
   const [underlineStyle, setUnderlineStyle] = React.useState({
@@ -40,28 +48,20 @@ function App() {
   });
 
   React.useEffect(() => {
-    // trigger hero on mount
-    setTimeout(() => {
-      setIsVisible((prev) => ({ ...prev, home: true }));
-    }, 100);
+    setTimeout(() => setIsVisible((p) => ({ ...p, home: true })), 120);
 
-    // Intersection Observer for enter/leave animations
-    const observerOptions = {
-      threshold: 0.35,
-      rootMargin: "0px 0px -10% 0px",
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.id;
+          if (!id) return;
+          setIsVisible((prev) => ({ ...prev, [id]: entry.isIntersecting }));
+        });
+      },
+      { threshold: 0.35, rootMargin: "0px 0px -10% 0px" }
+    );
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const id = entry.target.id;
-        if (!id) return;
-        // toggle visibility based on intersection (enter = true, leave = false)
-        setIsVisible((prev) => ({ ...prev, [id]: entry.isIntersecting }));
-      });
-    }, observerOptions);
-
-    const sectionsToObserve = ["home", "about", "prizes", "memories", "faqs"];
-    sectionsToObserve.forEach((id) => {
+    ["about", "prizes", "memories", "faqs", "home"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -69,92 +69,96 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  // Update active section based on viewport midpoint
   React.useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["home", "about", "prizes", "memories", "faqs"];
+    const sections = ["home", "about", "prizes", "memories", "faqs"];
+    let ticking = false;
+
+    const calcActive = () => {
       const viewportMid = window.scrollY + window.innerHeight / 2;
       let current = "home";
-
-      for (let i = 0; i < sections.length; i++) {
-        const el = document.getElementById(sections[i]);
+      for (let id of sections) {
+        const el = document.getElementById(id);
         if (!el) continue;
-        const rectTop = el.offsetTop;
-        const rectBottom = rectTop + el.offsetHeight;
-        if (viewportMid >= rectTop && viewportMid < rectBottom) {
-          current = sections[i];
+        const top = el.offsetTop;
+        const bottom = top + el.offsetHeight;
+        if (viewportMid >= top && viewportMid < bottom) {
+          current = id;
           break;
         }
       }
-
       setActiveSection((prev) => (prev !== current ? current : prev));
+      ticking = false;
     };
 
-    // run once
-    handleScroll();
-    const throttled = () => {
-      // cheap throttle using requestAnimationFrame
-      if (
-        typeof handleScroll.__ticking === "undefined" ||
-        !handleScroll.__ticking
-      ) {
-        handleScroll.__ticking = true;
-        requestAnimationFrame(() => {
-          handleScroll();
-          handleScroll.__ticking = false;
-        });
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(calcActive);
       }
     };
 
-    window.addEventListener("scroll", throttled, { passive: true });
-    window.addEventListener("resize", throttled);
+    calcActive();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      window.removeEventListener("scroll", throttled);
-      window.removeEventListener("resize", throttled);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
-  // Update underline position when activeSection changes
   React.useEffect(() => {
-    const updateUnderline = () => {
-      const activeRef = navRefs.current[activeSection];
-      if (activeRef) {
-        // offsetLeft relative to positioned parent — nav wrapper is positioned relative
-        const { offsetLeft, offsetWidth } = activeRef;
-        setUnderlineStyle({
-          left: offsetLeft,
-          width: offsetWidth,
-        });
+    const update = () => {
+      const ref = navRefs.current[activeSection];
+      if (ref) {
+        const left = ref.offsetLeft;
+        const width = ref.offsetWidth;
+        setUnderlineStyle({ left, width });
       }
     };
-
-    updateUnderline();
-    window.addEventListener("resize", updateUnderline);
-    return () => window.removeEventListener("resize", updateUnderline);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, [activeSection]);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setMobileMenuOpen(false);
-      // activeSection will update from scroll handler (keeps sync)
-    }
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+    setMobileMenuOpen(false);
+  };
+
+  const handleRegisterClick = () => {
+    window.open(
+      "https://unstop.com/o/iuvm4BM?lb=XXQIl8jQ&utm_medium=Share&utm_source=pankacha9021&utm_campaign=Online_coding_challenge",
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-black/95 backdrop-blur-sm border-b border-black z-50 animate-slideDown">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 flex items-center justify-between">
-          <div className="text-xl sm:text-2xl lg:text-3xl font-semibold">
-            G<span className="text-red-600">DX</span>R
+    <div className="min-h-screen text-white">
+      {/* Pokeball background decorations */}
+      <div className="pokeball-bg-deco pokeball-1"></div>
+      <div className="pokeball-bg-deco pokeball-2"></div>
+      <div className="pokeball-bg-deco pokeball-3"></div>
+
+      <nav className="fixed top-0 left-0 right-0 bg-black/95 backdrop-blur-sm border-b border-black z-50">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img
+              src={snorlax}
+              alt="Snorlax"
+              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              style={{ filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))" }}
+            />
+            <div className="text-xl sm:text-2xl font-normal">
+              G<span className="text-red-600">DX</span>R
+            </div>
           </div>
 
-          {/* Mobile menu button */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden text-white p-2 hover:bg-gray-800 rounded transition-colors"
+            onClick={() => setMobileMenuOpen((s) => !s)}
+            className="lg:hidden text-white p-2 hover:bg-gray-800 rounded"
+            aria-label="menu"
           >
             <svg
               className="w-6 h-6"
@@ -180,53 +184,53 @@ function App() {
             </svg>
           </button>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center relative">
-            <div className="flex items-center gap-8 text-base font-medium">
+            {/* Nav Pokemon mascot that follows underline - to the left of text */}
+            <img
+              src={pikachu}
+              alt="Pikachu"
+              className="nav-pokemon-static"
+              style={{
+                left: underlineStyle.left + "px",
+              }}
+            />
+
+            <div className="flex items-center gap-6 xl:gap-8 text-base xl:text-lg">
               <button
                 ref={(el) => (navRefs.current.home = el)}
                 onClick={() => scrollToSection("home")}
-                className={`relative py-2 px-1 hover:text-[#87c4ea] transition-colors ${
-                  activeSection === "home" ? "text-white" : "text-gray-300"
-                }`}
+                className="relative hover:opacity-80 transition-opacity py-2"
               >
                 Home
               </button>
               <button
                 ref={(el) => (navRefs.current.about = el)}
                 onClick={() => scrollToSection("about")}
-                className={`relative py-2 px-1 hover:text-[#87c4ea] transition-colors ${
-                  activeSection === "about" ? "text-white" : "text-gray-300"
-                }`}
+                className="relative hover:opacity-80 transition-opacity py-2"
               >
                 About
               </button>
               <button
                 ref={(el) => (navRefs.current.memories = el)}
                 onClick={() => scrollToSection("memories")}
-                className={`relative py-2 px-1 hover:text-[#87c4ea] transition-colors ${
-                  activeSection === "memories" ? "text-white" : "text-gray-300"
-                }`}
+                className="relative hover:opacity-80 transition-opacity py-2"
               >
                 Memories
               </button>
               <button
                 ref={(el) => (navRefs.current.faqs = el)}
                 onClick={() => scrollToSection("faqs")}
-                className={`relative py-2 px-1 hover:text-[#87c4ea] transition-colors ${
-                  activeSection === "faqs" ? "text-white" : "text-gray-300"
-                }`}
+                className="relative hover:opacity-80 transition-opacity py-2"
               >
-                FAQs
+                FAQS
               </button>
             </div>
 
-            {/* Sliding Underline */}
             <div
-              className="absolute bottom-0 h-[2px] transition-all duration-400 ease-out"
+              className="absolute bottom-0 h-[3px] transition-all duration-500 ease-out"
               style={{
-                left: `${underlineStyle.left}px`,
-                width: `${underlineStyle.width}px`,
+                left: underlineStyle.left + "px",
+                width: underlineStyle.width + "px",
               }}
             >
               <img
@@ -238,197 +242,143 @@ function App() {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-black/95 backdrop-blur-sm border-t border-gray-800 animate-slideDown">
-            <div className="px-4 py-3 space-y-1">
+          <div className="lg:hidden bg-black/95 border-t border-gray-800">
+            <div className="px-4 py-4 space-y-3">
               <button
                 onClick={() => scrollToSection("home")}
-                className={`block w-full text-left px-4 py-2.5 text-base hover:bg-gray-900 rounded transition-all ${
-                  activeSection === "home"
-                    ? "bg-gray-900 border-l-4 border-[#87c4ea] text-white"
-                    : "text-gray-300"
-                }`}
+                className="block w-full text-left px-4 py-2 text-xl hover:bg-gray-900 rounded"
               >
                 Home
               </button>
               <button
                 onClick={() => scrollToSection("about")}
-                className={`block w-full text-left px-4 py-2.5 text-base hover:bg-gray-900 rounded transition-all ${
-                  activeSection === "about"
-                    ? "bg-gray-900 border-l-4 border-[#87c4ea] text-white"
-                    : "text-gray-300"
-                }`}
+                className="block w-full text-left px-4 py-2 text-xl hover:bg-gray-900 rounded"
               >
                 About
               </button>
               <button
                 onClick={() => scrollToSection("memories")}
-                className={`block w-full text-left px-4 py-2.5 text-base hover:bg-gray-900 rounded transition-all ${
-                  activeSection === "memories"
-                    ? "bg-gray-900 border-l-4 border-[#87c4ea] text-white"
-                    : "text-gray-300"
-                }`}
+                className="block w-full text-left px-4 py-2 text-xl hover:bg-gray-900 rounded"
               >
                 Memories
               </button>
               <button
                 onClick={() => scrollToSection("faqs")}
-                className={`block w-full text-left px-4 py-2.5 text-base hover:bg-gray-900 rounded transition-all ${
-                  activeSection === "faqs"
-                    ? "bg-gray-900 border-l-4 border-[#87c4ea] text-white"
-                    : "text-gray-300"
-                }`}
+                className="block w-full text-left px-4 py-2 text-xl hover:bg-gray-900 rounded"
               >
-                FAQs
+                FAQS
               </button>
             </div>
           </div>
         )}
 
-        <div className="h-[2px] bg-[#87c4ea]" />
+        <div className="h-[3px] sm:h-[4px] bg-[#87c4ea]" />
       </nav>
 
-      {/* Hero Section */}
       <section
         id="home"
-        className="relative min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto"
+        className="relative min-h-screen pt-16 sm:pt-20 lg:pt-24 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto flex items-center"
       >
-        <div className="relative min-h-[600px] sm:min-h-[700px] lg:h-[900px]">
-          {/* Background Image */}
-          <div
-            className={`absolute right-0 top-0 w-[200px] h-[280px] sm:w-[300px] sm:h-[420px] md:w-[400px] md:h-[560px] lg:w-[636px] lg:h-[889px] opacity-50 sm:opacity-75 lg:opacity-100 transition-all duration-1000 ${
-              isVisible.home
-                ? "translate-x-0 opacity-100"
-                : "translate-x-full opacity-0"
-            }`}
-          >
-            <img
-              src={heroImage}
-              alt="Genesis mascot"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="relative w-full">
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-center">
+              <div className="genesis-wrapper relative">
+                {/* Pokemon decorations around the title */}
+                <img
+                  src={pikachu}
+                  alt="Pikachu"
+                  className="pokemon-title-deco pokemon-title-deco-1"
+                />
+                <img
+                  src={bulbasaur}
+                  alt="Bulbasaur"
+                  className="pokemon-title-deco pokemon-title-deco-2"
+                />
+                <img
+                  src={charmander}
+                  alt="Charmander"
+                  className="pokemon-title-deco pokemon-title-deco-3"
+                />
+                <img
+                  src={squirtle}
+                  alt="Squirtle"
+                  className="pokemon-title-deco pokemon-title-deco-4"
+                />
 
-          {/* Content */}
-          <div className="relative z-10 pt-8 sm:pt-16 lg:pt-32">
-            <div
-              className={`flex flex-col sm:flex-row items-start sm:items-center transition-all duration-1000 delay-300 ${
-                isVisible.home
-                  ? "translate-x-0 opacity-100"
-                  : "-translate-x-full opacity-0"
-              }`}
-            >
-              <h1
-                className="text-6xl sm:text-8xl md:text-9xl lg:text-[150px] font-black leading-none"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
-              >
-                GENESIS
-              </h1>
-              <span
-                className="text-[120px] sm:text-[200px] md:text-[300px] lg:text-[400px] font-black leading-none sm:ml-4 lg:ml-8 text-[#87c4ea]"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
-              >
-                5
-              </span>
+                <h1 className="genesis-logo">
+                  GENESIS <span className="genesis-number">5</span>
+                </h1>
+              </div>
             </div>
 
             <p
-              className={`text-base sm:text-xl md:text-2xl lg:text-[32px] mt-4 sm:mt-6 lg:mt-8 max-w-xl transition-all duration-1000 delay-500 ${
-                isVisible.home
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-10 opacity-0"
-              }`}
+              className="text-base sm:text-xl md:text-2xl lg:text-[28px] mt-4 sm:mt-6 max-w-xl text-center mx-auto"
               style={{ fontFamily: "'Livvic', sans-serif" }}
             >
               REALITY CAN BE WHATEVER WE WANT
             </p>
 
-            <button
-              className={`mt-8 sm:mt-12 lg:mt-16 bg-[#0f79c4] text-white text-lg sm:text-2xl lg:text-4xl px-8 sm:px-12 lg:px-14 py-3 sm:py-4 lg:py-5 rounded-xl lg:rounded-2xl hover:bg-[#0d6aac] hover:scale-105 transition-all duration-300 delay-700 ${
-                isVisible.home
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-10 opacity-0"
-              }`}
-              style={{ fontFamily: "'Cairo', sans-serif" }}
-            >
-              Register
-            </button>
+            <div className="text-center">
+              <button
+                onClick={handleRegisterClick}
+                className="mt-6 sm:mt-8 lg:mt-10 bg-[#0f79c4] text-white text-lg sm:text-2xl lg:text-3xl px-8 sm:px-12 lg:px-14 py-3 sm:py-4 rounded-xl lg:rounded-2xl hover:bg-[#0d6aac] hover:scale-105 transition-all duration-300"
+                style={{ fontFamily: "'Cairo', sans-serif" }}
+              >
+                Register
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
       <section
         id="about"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-          {/* Left Image */}
-          <div
-            className={`w-full lg:w-[616px] flex-shrink-0 transition-all duration-1000 ${
-              isVisible.about
-                ? "translate-x-0 opacity-100"
-                : "-translate-x-full opacity-0"
-            }`}
-          >
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
+          <div className="w-full lg:w-[500px] xl:w-[550px] flex-shrink-0 transition-all duration-1000">
             <img
               src={aboutImage}
-              alt="Pokemon character"
-              className="w-full h-auto object-cover rounded-lg hover:scale-105 transition-transform duration-500"
+              alt="Character"
+              className="w-full h-auto object-contain max-h-[500px] lg:max-h-[600px]"
+              style={{ filter: "drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))" }}
             />
           </div>
 
-          {/* Right Content */}
-          <div
-            className={`flex-1 lg:pt-12 transition-all duration-1000 delay-300 ${
-              isVisible.about
-                ? "translate-x-0 opacity-100"
-                : "translate-x-full opacity-0"
-            }`}
-          >
+          <div className="flex-1">
             <h2
-              className="text-4xl sm:text-6xl md:text-7xl lg:text-[96px] font-black leading-tight mb-4 sm:mb-6 lg:mb-8"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[80px] font-black leading-tight mb-4 sm:mb-6 lg:mb-8"
               style={{ fontFamily: "'Londrina Solid', sans-serif" }}
             >
               ABOUT GENESIS
             </h2>
 
             <p
-              className="text-base sm:text-xl md:text-2xl lg:text-[32px] leading-relaxed mb-6 sm:mb-8 lg:mb-12"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[28px] leading-relaxed mb-6 sm:mb-8 lg:mb-10"
               style={{ fontFamily: "'Livvic', sans-serif" }}
             >
               Rev your engines and fasten your seat belts as the GDXR Club
               kick-starts the Fourth Edition of Genesis - your ticket to an
-              adventure that hits closer to home than ever! Returning after the
-              2024 Last Edition, this 2025 Genesis isn't just about pixels and
-              coding; it's about bringing the spirit of games to life.
+              adventure...
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-8">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
               <div
-                className="border border-[#87c4ea] rounded-2xl sm:rounded-3xl lg:rounded-[40px] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 shadow-[inset_0px_4px_4px_0px_rgba(0,0,0,0.25)] hover:scale-105 transition-transform duration-300"
+                className="border border-[#87c4ea] rounded-2xl px-4 py-3"
                 style={{ fontFamily: "'Livvic', sans-serif" }}
               >
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-[32px]">
-                  Stage 1:
-                  <br />
-                  Online Game
-                  <br />
-                  Jam Round
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl">
+                  Stage 1: Online Game Jam Round
                 </p>
               </div>
 
               <div
-                className="border border-[#87c4ea] rounded-2xl sm:rounded-3xl lg:rounded-[40px] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 hover:scale-105 transition-transform duration-300"
+                className="border border-[#87c4ea] rounded-2xl px-4 py-3"
                 style={{ fontFamily: "'Livvic', sans-serif" }}
               >
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-[32px]">
-                  Stage 2: Offline
-                  <br />
-                  Surprise Element
-                  <br />
-                  Round
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl">
+                  Stage 2: Offline Surprise Round
                 </p>
               </div>
             </div>
@@ -436,18 +386,11 @@ function App() {
         </div>
       </section>
 
-      {/* Prize Pool Section */}
       <section
         id="prizes"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
-        <div
-          className={`text-center transition-all duration-1000 ${
-            isVisible.prizes
-              ? "translate-y-0 opacity-100"
-              : "-translate-y-20 opacity-0"
-          }`}
-        >
+        <div className="text-center">
           <h2
             className="text-4xl sm:text-6xl md:text-7xl lg:text-[96px] font-black mb-2 sm:mb-4"
             style={{ fontFamily: "'Londrina Solid', sans-serif" }}
@@ -463,28 +406,13 @@ function App() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-6 sm:gap-8 lg:gap-16 mt-12 sm:mt-16 lg:mt-20">
-          {/* Second Place */}
-          <div
-            className={`flex flex-col items-center order-2 sm:order-1 transition-all duration-1000 delay-300 ${
-              isVisible.prizes
-                ? "translate-y-0 opacity-100"
-                : "translate-y-20 opacity-0"
-            }`}
-          >
-            <div className="relative">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full flex items-center justify-center mb-4 sm:mb-6 hover:scale-110 transition-transform duration-300">
-                <img src={prize3Circle} alt="" className="w-full h-full" />
-                <span
-                  className="absolute text-5xl sm:text-6xl lg:text-[96px] font-black text-white"
-                  style={{ fontFamily: "'Londrina Solid', sans-serif" }}
-                >
-                  2
-                </span>
-              </div>
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full mb-4">
+              <img src={prize3Circle} alt="" className="w-full h-full" />
             </div>
-            <div className="bg-white border-[3px] sm:border-[4px] lg:border-[5px] border-[#5a9dd7] rounded-3xl sm:rounded-[40px] lg:rounded-[50px] w-[260px] sm:w-[300px] lg:w-[362px] h-[200px] sm:h-[240px] lg:h-[282px] flex items-center justify-center hover:scale-105 transition-transform duration-300">
+            <div className="bg-white border-[3px] border-[#5a9dd7] rounded-3xl w-[260px] h-[200px] flex items-center justify-center">
               <p
-                className="text-5xl sm:text-6xl lg:text-[96px] font-black text-[#05427b]"
+                className="text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
               >
                 15k
@@ -492,27 +420,16 @@ function App() {
             </div>
           </div>
 
-          {/* First Place */}
-          <div
-            className={`flex flex-col items-center order-1 sm:order-2 sm:-mt-8 lg:-mt-16 transition-all duration-1000 delay-500 ${
-              isVisible.prizes
-                ? "translate-y-0 opacity-100"
-                : "translate-y-20 opacity-0"
-            }`}
-          >
-            <div className="relative">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-44 lg:h-44 rounded-full flex items-center justify-center mb-4 sm:mb-6 hover:scale-110 transition-transform duration-300">
-                <img src={prize1Circle} alt="" className="w-full h-full" />
-                <span
-                  className="absolute text-5xl sm:text-6xl lg:text-[96px] font-black text-[#05427b]"
-                  style={{ fontFamily: "'Londrina Solid', sans-serif" }}
-                >
-                  1
-                </span>
-              </div>
+          <div className="flex flex-col items-center sm:-mt-8 lg:-mt-16">
+            <div className="w-24 h-24 rounded-full mb-4">
+              <img src={prize1Circle} alt="" className="w-full h-full" />
             </div>
-            <div className="relative w-[300px] sm:w-[350px] lg:w-[417px] h-[230px] sm:h-[270px] lg:h-[319px] hover:scale-105 transition-transform duration-300">
-              <img src={prize1Badge} alt="" className="w-full h-full" />
+            <div className="relative w-[300px] h-[230px]">
+              <img
+                src={prize1Badge}
+                alt=""
+                className="w-full h-full object-cover"
+              />
               <p
                 className="absolute inset-0 flex items-center justify-center text-5xl sm:text-6xl lg:text-[96px] font-black text-white"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
@@ -522,28 +439,13 @@ function App() {
             </div>
           </div>
 
-          {/* Third Place */}
-          <div
-            className={`flex flex-col items-center order-3 transition-all duration-1000 delay-700 ${
-              isVisible.prizes
-                ? "translate-y-0 opacity-100"
-                : "translate-y-20 opacity-0"
-            }`}
-          >
-            <div className="relative">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full flex items-center justify-center mb-4 sm:mb-6 hover:scale-110 transition-transform duration-300">
-                <img src={prize2Circle} alt="" className="w-full h-full" />
-                <span
-                  className="absolute text-5xl sm:text-6xl lg:text-[96px] font-black text-white"
-                  style={{ fontFamily: "'Londrina Solid', sans-serif" }}
-                >
-                  3
-                </span>
-              </div>
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full mb-4">
+              <img src={prize2Circle} alt="" className="w-full h-full" />
             </div>
-            <div className="bg-white border-[3px] sm:border-[4px] lg:border-[5px] border-[#5a9dd7] rounded-3xl sm:rounded-[40px] lg:rounded-[50px] w-[262px] sm:w-[302px] lg:w-[365px] h-[200px] sm:h-[238px] lg:h-[280px] flex items-center justify-center hover:scale-105 transition-transform duration-300">
+            <div className="bg-white border-[3px] border-[#5a9dd7] rounded-3xl w-[262px] h-[200px] flex items-center justify-center">
               <p
-                className="text-5xl sm:text-6xl lg:text-[96px] font-black text-[#05427b]"
+                className="text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
               >
                 12.5K
@@ -553,65 +455,41 @@ function App() {
         </div>
       </section>
 
-      {/* Memories Section */}
       <section
         id="memories"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
         <h2
-          className={`text-4xl sm:text-6xl md:text-7xl lg:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 ${
-            isVisible.memories
-              ? "translate-y-0 opacity-100"
-              : "-translate-y-20 opacity-0"
-          }`}
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16"
           style={{ fontFamily: "'Londrina Solid', sans-serif" }}
         >
           MEMORIES
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
-          {[1, 2, 3, 4, 5, 6].map((item, index) => (
+          {[1, 2, 3, 4, 5, 6].map((item) => (
             <div
               key={item}
-              className={`bg-[#d9d9d9] w-full h-[200px] sm:h-[220px] lg:h-[236px] rounded-lg hover:scale-105 transition-all duration-500 cursor-pointer ${
-                isVisible.memories
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-20 opacity-0"
-              }`}
-              style={{ transitionDelay: `${index * 80}ms` }}
-            >
-              {/* Placeholder for images */}
-            </div>
+              className="bg-[#d9d9d9] w-full h-[200px] rounded-lg hover:scale-105 transition-transform cursor-pointer"
+            />
           ))}
         </div>
       </section>
 
-      {/* FAQS Section */}
       <section
         id="faqs"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
         <h2
-          className={`text-4xl sm:text-6xl md:text-7xl lg:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 ${
-            isVisible.faqs ? "scale-100 opacity-100" : "scale-75 opacity-0"
-          }`}
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16"
           style={{ fontFamily: "'Londrina Solid', sans-serif" }}
         >
           FAQS
         </h2>
-        <div
-          className={`max-w-4xl mx-auto text-center text-lg sm:text-xl lg:text-2xl transition-all duration-1000 delay-300 ${
-            isVisible.faqs
-              ? "translate-y-0 opacity-100"
-              : "translate-y-10 opacity-0"
-          }`}
-        >
+        <div className="max-w-4xl mx-auto text-center text-lg sm:text-xl lg:text-2xl">
           <p>Coming soon...</p>
         </div>
       </section>
     </div>
   );
 }
-
-export default App;
-// ...existing code...
