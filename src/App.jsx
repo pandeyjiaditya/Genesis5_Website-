@@ -2,6 +2,8 @@ import React from "react";
 import "./index.css";
 
 const aboutImage = "/character1.png";
+const navPokemon = "/nav.png";
+const logo = "/logo.png";
 const navUnderline =
   "https://www.figma.com/api/mcp/asset/ae47c3ad-dcb5-41f3-b627-8ed9b43ffbed";
 const prize1Badge =
@@ -22,8 +24,6 @@ const charmander =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png";
 const squirtle =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png";
-const snorlax =
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png";
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -31,6 +31,10 @@ export default function App() {
   const [underlineStyle, setUnderlineStyle] = React.useState({
     left: 0,
     width: 0,
+  });
+  const [floatingPokemonStyle, setFloatingPokemonStyle] = React.useState({
+    left: "50%",
+    top: "80px",
   });
   const [isVisible, setIsVisible] = React.useState({
     home: false,
@@ -46,6 +50,30 @@ export default function App() {
     memories: null,
     faqs: null,
   });
+  const floatingPokemonRef = React.useRef(null);
+  const navButtonRef = React.useRef(null);
+
+  // Move floating Pokemon to nav button on hover
+  const moveToNavButton = React.useCallback(() => {
+    if (navButtonRef.current && floatingPokemonRef.current) {
+      const buttonRect = navButtonRef.current.getBoundingClientRect();
+      const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+      const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+
+      setFloatingPokemonStyle({
+        left: `${buttonCenterX}px`,
+        top: `${buttonCenterY}px`,
+      });
+    }
+  }, []);
+
+  // Return to original position
+  const returnToOriginal = React.useCallback(() => {
+    setFloatingPokemonStyle({
+      left: "50%",
+      top: "80px",
+    });
+  }, []);
 
   React.useEffect(() => {
     setTimeout(() => setIsVisible((p) => ({ ...p, home: true })), 120);
@@ -141,18 +169,45 @@ export default function App() {
       <div className="pokeball-bg-deco pokeball-2"></div>
       <div className="pokeball-bg-deco pokeball-3"></div>
 
+      {/* Floating Pokemon - Fixed at top of Home section */}
+      <img
+        ref={floatingPokemonRef}
+        id="floating-pokemon"
+        src={navPokemon}
+        alt="Floating Pokemon"
+        className="floating-pokemon-home"
+        style={{
+          left: floatingPokemonStyle.left,
+          top: floatingPokemonStyle.top,
+        }}
+      />
+
       <nav className="fixed top-0 left-0 right-0 bg-black/95 backdrop-blur-sm border-b border-black z-50">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src={snorlax}
-              alt="Snorlax"
+              src={logo}
+              alt="Logo"
               className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
               style={{ filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))" }}
             />
             <div className="text-xl sm:text-2xl font-normal">
               G<span className="text-red-600">DX</span>R
             </div>
+            <button
+              ref={navButtonRef}
+              id="nav-button"
+              onMouseEnter={moveToNavButton}
+              onMouseLeave={returnToOriginal}
+              className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:scale-110 transition-transform"
+            >
+              <img
+                src={navPokemon}
+                alt="Nav Pokemon"
+                className="w-full h-full object-contain"
+                style={{ filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))" }}
+              />
+            </button>
           </div>
 
           <button
@@ -185,16 +240,6 @@ export default function App() {
           </button>
 
           <div className="hidden lg:flex items-center relative">
-            {/* Nav Pokemon mascot that follows underline - to the left of text */}
-            <img
-              src={pikachu}
-              alt="Pikachu"
-              className="nav-pokemon-static"
-              style={{
-                left: underlineStyle.left + "px",
-              }}
-            />
-
             <div className="flex items-center gap-6 xl:gap-8 text-base xl:text-lg">
               <button
                 ref={(el) => (navRefs.current.home = el)}
@@ -284,7 +329,7 @@ export default function App() {
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-center">
               <div className="genesis-wrapper relative">
-                {/* Pokemon decorations around the title */}
+                {/* Pokemon decorations around the title with more spacing */}
                 <img
                   src={pikachu}
                   alt="Pikachu"
@@ -337,11 +382,11 @@ export default function App() {
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
-          <div className="w-full lg:w-[500px] xl:w-[550px] flex-shrink-0 transition-all duration-1000">
+          <div className="w-full lg:w-[600px] xl:w-[650px] flex-shrink-0 transition-all duration-1000">
             <img
               src={aboutImage}
               alt="Character"
-              className="w-full h-auto object-contain max-h-[500px] lg:max-h-[600px]"
+              className="w-full h-auto object-contain max-h-[600px] lg:max-h-[700px]"
               style={{ filter: "drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))" }}
             />
           </div>
@@ -360,7 +405,9 @@ export default function App() {
             >
               Rev your engines and fasten your seat belts as the GDXR Club
               kick-starts the Fourth Edition of Genesis - your ticket to an
-              adventure...
+              adventure that hits closer to home than ever! Returning after the
+              2024 Last Edition, this 2025 Genesis isn't just about pixels and
+              coding; it's about bringing the spirit of games to life.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
