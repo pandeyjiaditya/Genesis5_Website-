@@ -444,7 +444,7 @@ export default function App() {
                     color: "#87c4ea",
                   }}
                 >
-                  Genesis 5 starts on Valentine's Day 2026! ❤️
+                  Genesis 5 starts on 14th Feb 2026! ❤️
                 </p>
                 <div className="countdown-grid">
                   <div className="countdown-item">
