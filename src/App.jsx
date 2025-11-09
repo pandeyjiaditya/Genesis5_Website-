@@ -809,7 +809,7 @@ export default function App() {
                 className="text-sm text-[#87c4ea] text-center md:text-left"
                 style={{ fontFamily: "'Cairo', sans-serif" }}
               >
-                © 2025 GDXR Club. All rights reserved. Made with ❤️ for game
+                © 2025 AR-VR Club. All rights reserved. Made with ❤️ for game
                 developers
               </p>
               <div
