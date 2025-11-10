@@ -37,6 +37,81 @@ const snorlax =
 const gengar =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png";
 
+const faqData = [
+  {
+    category: "Registration & Participation",
+    questions: [
+      {
+        q: "How can I register for GENESIS 5?",
+        a: "You can register through the official link on our website or Unstop page once registrations open.",
+      },
+      {
+        q: "What is the maximum number of participants per team?",
+        a: "Teams can have up to 4–5 members, covering roles like coding, design, and sound.",
+      },
+      {
+        q: "Can I join even if I don't know coding?",
+        a: "Absolutely! Artists, designers, storytellers, and sound creators are just as important as developers.",
+      },
+      {
+        q: "Can teams from different colleges participate together?",
+        a: "Yes, cross-college teams are welcome — collaboration makes the experience even better!",
+      },
+    ],
+  },
+  {
+    category: "Event Details",
+    questions: [
+      {
+        q: "What are the judging criteria?",
+        a: "Games will be judged on innovation, gameplay, design, theme relevance, and presentation.",
+      },
+      {
+        q: "Will there be mentors to guide participants?",
+        a: "Yes! Participants will get exclusive mentorship from industry experts, including VR leads and game professionals.",
+      },
+      {
+        q: "What kind of workshops or speaker sessions are planned?",
+        a: "Expect interactive sessions with developers, designers, and game industry veterans to inspire and upskill participants.",
+      },
+    ],
+  },
+  {
+    category: "Prizes & Perks",
+    questions: [
+      {
+        q: "What is the total prize pool?",
+        a: "GENESIS 5 offers an exciting prize pool of ₹45,000+, along with merch, goodies, and digital rewards.",
+      },
+      {
+        q: "Are there perks for all participants?",
+        a: "Yes — every participant gets exclusive GENESIS 5 merch, certificates, and networking opportunities.",
+      },
+      {
+        q: "Will all participants get certificates?",
+        a: "Yes, every registered participant who completes the event will receive a certificate of participation.",
+      },
+    ],
+  },
+  {
+    category: "General Information",
+    questions: [
+      {
+        q: "How can I stay updated about GENESIS 5?",
+        a: "Follow us on our official Instagram, LinkedIn, and Discord, and check the website regularly for updates.",
+      },
+      {
+        q: "What should I bring to the event?",
+        a: "Bring your laptop, charger, creative energy, and anything else you need to build your dream game.",
+      },
+      {
+        q: "Who can I contact for queries?",
+        a: "You can reach out to the GENESIS 5 Organizing Team via email or social media — all details are available on the Contact page.",
+      },
+    ],
+  },
+];
+
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState("home");
@@ -54,6 +129,8 @@ export default function App() {
     minutes: 0,
     seconds: 0,
   });
+  const [activeFaqCategory, setActiveFaqCategory] = React.useState(0);
+  const [openFaqIndex, setOpenFaqIndex] = React.useState({ "0-0": true });
 
   const navRefs = React.useRef({
     home: null,
@@ -142,16 +219,26 @@ export default function App() {
     const calcActive = () => {
       const viewportMid = window.scrollY + window.innerHeight / 2;
       let current = "home";
-      for (let id of sections) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        const top = el.offsetTop;
-        const bottom = top + el.offsetHeight;
-        if (viewportMid >= top && viewportMid < bottom) {
-          current = id;
-          break;
+
+      // Check if we're at the bottom of the page (in footer)
+      const isAtBottom =
+        window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
+
+      if (isAtBottom) {
+        current = "faqs";
+      } else {
+        for (let id of sections) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const top = el.offsetTop;
+          const bottom = top + el.offsetHeight;
+          if (viewportMid >= top && viewportMid < bottom) {
+            current = id;
+            break;
+          }
         }
       }
+
       setActiveSection((prev) => (prev !== current ? current : prev));
       ticking = false;
     };
@@ -200,6 +287,24 @@ export default function App() {
     );
   };
 
+  const toggleFaq = (categoryIndex, questionIndex) => {
+    const key = `${categoryIndex}-${questionIndex}`;
+    setOpenFaqIndex((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const handleCategoryChange = (index) => {
+    setActiveFaqCategory(index);
+    setOpenFaqIndex({ [`${index}-0`]: true });
+  };
+
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setActiveSection("home");
+  };
+
   return (
     <div className="min-h-screen text-white">
       {/* Pokeball background decorations */}
@@ -223,15 +328,20 @@ export default function App() {
       <nav className="fixed top-0 left-0 right-0 bg-black/95 backdrop-blur-sm border-b border-black z-50">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
-            <img
-              src={logo}
-              alt="Logo"
-              className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain"
-              style={{ filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))" }}
-            />
-            <div className="text-lg sm:text-xl lg:text-2xl font-normal">
-              G<span className="text-red-600">DX</span>R
-            </div>
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center gap-2 sm:gap-3"
+            >
+              <img
+                src={logo}
+                alt="Logo"
+                className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain"
+                style={{ filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))" }}
+              />
+              <div className="text-lg sm:text-xl lg:text-2xl font-normal">
+                G<span className="text-red-600">DX</span>R
+              </div>
+            </button>
             <button
               ref={navButtonRef}
               id="nav-button"
@@ -366,36 +476,36 @@ export default function App() {
         <div className="relative w-full">
           <div className="relative z-10">
             <div className="flex flex-col items-center justify-center">
-              <div className="genesis-wrapper relative">
+              <div className="genesis-wrapper-new relative mb-6 sm:mb-8">
                 <img
                   src={pikachu}
                   alt="Pikachu"
-                  className="pokemon-title-deco pokemon-title-deco-1"
-                />
-                <img
-                  src={bulbasaur}
-                  alt="Bulbasaur"
-                  className="pokemon-title-deco pokemon-title-deco-2"
+                  className="pokemon-hero-deco pokemon-hero-1"
                 />
                 <img
                   src={charmander}
                   alt="Charmander"
-                  className="pokemon-title-deco pokemon-title-deco-3"
+                  className="pokemon-hero-deco pokemon-hero-2"
                 />
                 <img
                   src={squirtle}
                   alt="Squirtle"
-                  className="pokemon-title-deco pokemon-title-deco-4"
+                  className="pokemon-hero-deco pokemon-hero-3"
+                />
+                <img
+                  src={bulbasaur}
+                  alt="Bulbasaur"
+                  className="pokemon-hero-deco pokemon-hero-4"
                 />
 
-                <h1 className="genesis-logo">
-                  GENESIS <span className="genesis-number">5</span>
+                <h1 className="genesis-logo-new">
+                  GENESIS <span className="genesis-number-new">5</span>
                 </h1>
               </div>
             </div>
 
             <p
-              className="text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-[28px] mt-4 sm:mt-6 max-w-xl text-center mx-auto px-4"
+              className="text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-[28px] mb-6 sm:mb-8 max-w-2xl text-center mx-auto px-4"
               style={{ fontFamily: "'Livvic', sans-serif" }}
             >
               REALITY CAN BE WHATEVER WE WANT
@@ -404,15 +514,15 @@ export default function App() {
             <div className="text-center">
               <button
                 onClick={handleRegisterClick}
-                className="mt-6 sm:mt-8 lg:mt-10 bg-[#0f79c4] text-white text-base sm:text-xl lg:text-2xl xl:text-3xl px-6 sm:px-10 lg:px-14 py-2 sm:py-3 lg:py-4 rounded-lg lg:rounded-xl hover:bg-[#0d6aac] hover:scale-105 transition-all duration-300"
+                className="bg-[#0f79c4] text-white text-base sm:text-xl lg:text-2xl xl:text-3xl px-6 sm:px-10 lg:px-14 py-2 sm:py-3 lg:py-4 rounded-lg lg:rounded-xl hover:bg-[#0d6aac] hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/50"
                 style={{ fontFamily: "'Cairo', sans-serif" }}
               >
-                Register
+                Register Now
               </button>
             </div>
 
             {/* Countdown Timer - Below Register Button */}
-            <div className="mt-12 sm:mt-16 lg:mt-20 relative">
+            <div className="mt-16 sm:mt-20 lg:mt-24 relative">
               {/* Pokemon decorations in front */}
               <img
                 src={jigglypuff}
@@ -546,23 +656,37 @@ export default function App() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-4 sm:gap-6 lg:gap-12 xl:gap-16 mt-8 sm:mt-12 lg:mt-16">
+          {/* 3rd Place */}
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4 relative">
               <img src={prize3Circle} alt="" className="w-full h-full" />
+              <div
+                className="absolute inset-0 flex items-center justify-center text-[#05427b] font-bold text-sm sm:text-base"
+                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+              >
+                3RD
+              </div>
             </div>
             <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[240px] lg:w-[260px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center">
               <p
                 className="text-4xl sm:text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
               >
-                15k
+                12.5K
               </p>
             </div>
           </div>
 
+          {/* 1st Place */}
           <div className="flex flex-col items-center sm:-mt-4 lg:-mt-8">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4 relative">
               <img src={prize1Circle} alt="" className="w-full h-full" />
+              <div
+                className="absolute inset-0 flex items-center justify-center text-[#05427b] font-bold text-base sm:text-lg"
+                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+              >
+                1ST
+              </div>
             </div>
             <div className="relative w-[240px] sm:w-[280px] lg:w-[300px] h-[180px] sm:h-[210px] lg:h-[230px]">
               <img
@@ -579,16 +703,23 @@ export default function App() {
             </div>
           </div>
 
+          {/* 2nd Place */}
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4 relative">
               <img src={prize2Circle} alt="" className="w-full h-full" />
+              <div
+                className="absolute inset-0 flex items-center justify-center text-[#05427b] font-bold text-sm sm:text-base"
+                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+              >
+                2ND
+              </div>
             </div>
             <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[242px] lg:w-[262px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center">
               <p
                 className="text-4xl sm:text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
               >
-                12.5K
+                15K
               </p>
             </div>
           </div>
@@ -621,13 +752,70 @@ export default function App() {
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
         <h2
-          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black text-center mb-6 sm:mb-10 lg:mb-16"
+          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16"
           style={{ fontFamily: "'Londrina Solid', sans-serif" }}
         >
           FAQS
         </h2>
-        <div className="max-w-4xl mx-auto text-center text-base sm:text-lg lg:text-xl xl:text-2xl">
-          <p>Coming soon...</p>
+
+        <div className="max-w-4xl mx-auto space-y-8">
+          {faqData.map((category, catIndex) => (
+            <div key={catIndex} className="space-y-4">
+              <h3
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#ffe14d] mb-4"
+                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+              >
+                {category.category}
+              </h3>
+              <div className="space-y-3">
+                {category.questions.map((item, qIndex) => {
+                  const key = `${catIndex}-${qIndex}`;
+                  const isOpen = openFaqIndex[key];
+                  return (
+                    <div
+                      key={qIndex}
+                      className="bg-gradient-to-r from-[#0a0e27]/80 to-[#1a1d3a]/80 border border-[#87c4ea]/30 rounded-xl overflow-hidden backdrop-blur-sm"
+                    >
+                      <button
+                        onClick={() => toggleFaq(catIndex, qIndex)}
+                        className="w-full px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-[#87c4ea]/10 transition-colors"
+                      >
+                        <span
+                          className="text-left text-sm sm:text-base lg:text-lg text-white font-medium"
+                          style={{ fontFamily: "'Cairo', sans-serif" }}
+                        >
+                          {item.q}
+                        </span>
+                        <svg
+                          className={`w-5 h-5 sm:w-6 sm:h-6 text-[#87c4ea] transition-transform flex-shrink-0 ml-4 ${
+                            isOpen ? "rotate-180" : ""
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
+                      {isOpen && (
+                        <div
+                          className="px-4 sm:px-6 pb-4 text-sm sm:text-base lg:text-lg text-[#87c4ea] leading-relaxed"
+                          style={{ fontFamily: "'Livvic', sans-serif" }}
+                        >
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -773,7 +961,7 @@ export default function App() {
                   </svg>
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/gdxr_ait/"
                   className="w-10 h-10 rounded-full bg-[#0f79c4] hover:bg-[#0d6aac] flex items-center justify-center transition-all hover:scale-110"
                   aria-label="Instagram"
                 >

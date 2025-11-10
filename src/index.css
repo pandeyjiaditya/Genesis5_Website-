@@ -680,19 +680,177 @@ body::after {
   }
 }
 
-/* 3D Canvas Styling */
-canvas {
-  display: block;
+/* NEW Hero Layout - Pokemon Style */
+.genesis-wrapper-new {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 60px 40px 40px 40px;
+  min-height: 280px;
 }
 
-.three-scene-wrapper {
-  background: rgba(10, 14, 39, 0.3);
-  border: 2px solid rgba(135, 196, 234, 0.2);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
-    inset 0 0 20px rgba(135, 196, 234, 0.1);
+.genesis-logo-new {
+  font-family: "Luckiest Guy", "Londrina Solid", sans-serif;
+  font-weight: 900;
+  letter-spacing: 4px;
+  line-height: 1;
+  display: inline-block;
+  font-size: clamp(48px, 12vw, 180px);
+  background: linear-gradient(180deg, #ffe14d 0%, #ffd000 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: clamp(4px, 1vw, 10px) #0b66a6;
+  text-shadow: 0 8px 0 rgba(11, 102, 166, 0.3), 0 20px 50px rgba(0, 0, 0, 0.7);
+  transform: translateZ(0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+  filter: drop-shadow(0 12px 30px rgba(255, 215, 0, 0.4));
 }
 
-/* global tweaks */
-* {
-  box-sizing: border-box;
+.genesis-number-new {
+  margin-left: clamp(6px, 2vw, 16px);
+  font-size: 1.1em;
+  transform: translateY(-10px);
+  -webkit-text-stroke: clamp(5px, 1.2vw, 12px) #0b66a6;
+  filter: drop-shadow(0 14px 35px rgba(5, 24, 45, 0.6));
 }
+
+/* Pokemon decorations around GENESIS - New positions */
+.pokemon-hero-deco {
+  position: absolute;
+  width: clamp(100px, 15vw, 200px);
+  height: clamp(100px, 15vw, 200px);
+  object-fit: contain;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.6));
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Top left - Pikachu */
+.pokemon-hero-1 {
+  top: -5%;
+  left: -5%;
+  animation: float 3.2s ease-in-out infinite;
+}
+
+/* Top right - Bulbasaur */
+.pokemon-hero-2 {
+  top: 0%;
+  right: -5%;
+  animation: floatReverse 3.7s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+/* Middle left - Charmander */
+.pokemon-hero-3 {
+  top: 50%;
+  left: -8%;
+  transform: translateY(-50%);
+  animation: float 4.2s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+/* Middle right - Squirtle */
+.pokemon-hero-4 {
+  top: 50%;
+  right: -8%;
+  transform: translateY(-50%);
+  animation: floatReverse 3.9s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+/* Bottom left - Mew */
+.pokemon-hero-5 {
+  bottom: -5%;
+  left: 0%;
+  animation: float 4.5s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+
+/* Bottom right - Dragonite */
+.pokemon-hero-6 {
+  bottom: -5%;
+  right: 0%;
+  animation: floatReverse 4s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Responsive adjustments for hero */
+@media (max-width: 1024px) {
+  .genesis-wrapper-new {
+    padding: 50px 30px 30px 30px;
+  }
+
+  .pokemon-hero-deco {
+    width: clamp(80px, 12vw, 140px);
+    height: clamp(80px, 12vw, 140px);
+  }
+}
+
+@media (max-width: 768px) {
+  .genesis-wrapper-new {
+    padding: 40px 20px 20px 20px;
+    min-height: 220px;
+  }
+
+  .genesis-logo-new {
+    font-size: clamp(36px, 10vw, 120px);
+    -webkit-text-stroke: clamp(3px, 0.8vw, 8px) #0b66a6;
+  }
+
+  .genesis-number-new {
+    -webkit-text-stroke: clamp(4px, 1vw, 9px) #0b66a6;
+  }
+
+  .pokemon-hero-deco {
+    width: clamp(60px, 14vw, 100px);
+    height: clamp(60px, 14vw, 100px);
+  }
+
+  .pokemon-hero-1 {
+    top: -8%;
+    left: -8%;
+  }
+
+  .pokemon-hero-2 {
+    top: -5%;
+    right: -8%;
+  }
+
+  .pokemon-hero-3 {
+    left: -10%;
+  }
+
+  .pokemon-hero-4 {
+    right: -10%;
+  }
+
+  .pokemon-hero-5 {
+    bottom: -8%;
+    left: -3%;
+  }
+
+  .pokemon-hero-6 {
+    bottom: -8%;
+    right: -3%;
+  }
+}
+
+@media (max-width: 480px) {
+  .genesis-wrapper-new {
+    padding: 30px 15px 15px 15px;
+    min-height: 180px;
+  }
+
+  .pokemon-hero-deco {
+    width: clamp(50px, 16vw, 80px);
+    height: clamp(50px, 16vw, 80px);
+  }
+}
+
+/* ...existing code... */
