@@ -4,16 +4,6 @@ import "./index.css";
 const aboutImage = "/character1.png";
 const navPokemon = "/nav.png";
 const logo = "/logo.png";
-const navUnderline =
-  "https://www.figma.com/api/mcp/asset/ae47c3ad-dcb5-41f3-b627-8ed9b43ffbed";
-const prize1Badge =
-  "https://www.figma.com/api/mcp/asset/36de643e-8490-40ed-9fad-db161f36a237";
-const prize1Circle =
-  "https://www.figma.com/api/mcp/asset/0b6a251a-0227-44b0-8363-9a8f61ea54e4";
-const prize2Circle =
-  "https://www.figma.com/api/mcp/asset/f5e190df-d251-41a5-9a00-a06d7d04d240";
-const prize3Circle =
-  "https://www.figma.com/api/mcp/asset/57702666-5ebf-4b0c-8216-57d367d93a7e";
 
 // Pokemon images
 const pikachu =
@@ -36,6 +26,25 @@ const snorlax =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png";
 const gengar =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png";
+const mew =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/151.png";
+const togepi =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/175.png";
+const charizard =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png";
+const gyarados =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png";
+const dragonite =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png";
+const mewtwo =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png";
+const lapras =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png";
+const alakazam =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png";
+const arcanine =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/59.png";
+const blastoise = "blastoise.png";
 
 const faqData = [
   {
@@ -113,6 +122,8 @@ const faqData = [
 ];
 
 export default function App() {
+  const [loading, setLoading] = React.useState(true);
+  const [loadingFadeOut, setLoadingFadeOut] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState("home");
   const [underlineStyle, setUnderlineStyle] = React.useState({
@@ -140,6 +151,18 @@ export default function App() {
   });
   const floatingPokemonRef = React.useRef(null);
   const navButtonRef = React.useRef(null);
+
+  // Loading Screen Effect - REDUCED TO 9 SECONDS
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingFadeOut(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 800);
+    }, 9000); // Changed from 12000 to 9000
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Countdown Timer Logic
   React.useEffect(() => {
@@ -191,36 +214,15 @@ export default function App() {
     });
   }, []);
 
-  React.useEffect(() => {
-    setTimeout(() => {}, 120);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const id = entry.target.id;
-          if (!id) return;
-        });
-      },
-      { threshold: 0.35, rootMargin: "0px 0px -10% 0px" }
-    );
-
-    ["about", "prizes", "memories", "faqs", "home"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
+  // Active section detection based on scroll
   React.useEffect(() => {
     const sections = ["home", "about", "prizes", "memories", "faqs"];
     let ticking = false;
 
     const calcActive = () => {
-      const viewportMid = window.scrollY + window.innerHeight / 2;
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
       let current = "home";
 
-      // Check if we're at the bottom of the page (in footer)
       const isAtBottom =
         window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
 
@@ -232,7 +234,7 @@ export default function App() {
           if (!el) continue;
           const top = el.offsetTop;
           const bottom = top + el.offsetHeight;
-          if (viewportMid >= top && viewportMid < bottom) {
+          if (scrollPosition >= top && scrollPosition < bottom) {
             current = id;
             break;
           }
@@ -259,6 +261,7 @@ export default function App() {
     };
   }, []);
 
+  // Update underline position when active section changes
   React.useEffect(() => {
     const update = () => {
       const ref = navRefs.current[activeSection];
@@ -289,10 +292,16 @@ export default function App() {
 
   const toggleFaq = (categoryIndex, questionIndex) => {
     const key = `${categoryIndex}-${questionIndex}`;
-    setOpenFaqIndex((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setOpenFaqIndex((prev) => {
+      const newState = {};
+      Object.keys(prev).forEach((k) => {
+        if (k.startsWith(`${categoryIndex}-`)) {
+          newState[k] = false;
+        }
+      });
+      newState[key] = !prev[key];
+      return newState;
+    });
   };
 
   const handleCategoryChange = (index) => {
@@ -305,12 +314,254 @@ export default function App() {
     setActiveSection("home");
   };
 
+  if (loading) {
+    return (
+      <div className={`loading-screen ${loadingFadeOut ? "fade-out" : ""}`}>
+        {/* Background Decorations */}
+        <div className="loading-bg-pattern"></div>
+
+        {/* Aggressive Pokemon Decorations */}
+        <img
+          src={charizard}
+          alt=""
+          className="loading-pokemon loading-pokemon-1"
+        />
+        <img
+          src={gyarados}
+          alt=""
+          className="loading-pokemon loading-pokemon-2"
+        />
+        <img
+          src={dragonite}
+          alt=""
+          className="loading-pokemon loading-pokemon-3"
+        />
+        <img
+          src={mewtwo}
+          alt=""
+          className="loading-pokemon loading-pokemon-4"
+        />
+        <img
+          src={gengar}
+          alt=""
+          className="loading-pokemon loading-pokemon-5"
+        />
+
+        {/* Top Center Logo */}
+        <div className="loading-logo-container">
+          <img src={logo} alt="GDXR Logo" className="loading-logo" />
+          <div className="loading-logo-text">
+            G<span className="text-red-600">DX</span>R
+          </div>
+        </div>
+
+        {/* Center Content */}
+        <div className="loading-content">
+          {/* Pokeball Animation */}
+          <div className="pokeball-loader">
+            <div className="pokeball">
+              <div className="pokeball-top"></div>
+              <div className="pokeball-bottom"></div>
+              <div className="pokeball-center">
+                <div className="pokeball-inner-circle"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Loading Text */}
+          <div className="loading-text-container">
+            <h1 className="loading-title">GENESIS</h1>
+            <p className="loading-subtitle">Loading...</p>
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Progress Bar */}
+        <div className="loading-progress-bar">
+          <div className="loading-progress-fill"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen text-white">
       {/* Pokeball background decorations */}
       <div className="pokeball-bg-deco pokeball-1"></div>
       <div className="pokeball-bg-deco pokeball-2"></div>
       <div className="pokeball-bg-deco pokeball-3"></div>
+
+      {/* Global Faded Pokemon - Spread Across Entire Website */}
+      <img
+        src={snorlax}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "8%",
+          left: "2%",
+          width: "clamp(100px, 12vw, 150px)",
+          height: "clamp(100px, 12vw, 150px)",
+          opacity: 0.08,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={lapras}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "15%",
+          right: "3%",
+          width: "clamp(90px, 11vw, 140px)",
+          height: "clamp(90px, 11vw, 140px)",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={gengar}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "40%",
+          left: "1%",
+          width: "clamp(95px, 11vw, 145px)",
+          height: "clamp(95px, 11vw, 145px)",
+          opacity: 0.06,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={alakazam}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "50%",
+          right: "2%",
+          width: "clamp(85px, 10vw, 135px)",
+          height: "clamp(85px, 10vw, 135px)",
+          opacity: 0.08,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={arcanine}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          bottom: "25%",
+          left: "3%",
+          width: "clamp(90px, 11vw, 140px)",
+          height: "clamp(90px, 11vw, 140px)",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={blastoise}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          bottom: "20%",
+          right: "4%",
+          width: "clamp(95px, 11vw, 145px)",
+          height: "clamp(95px, 11vw, 145px)",
+          opacity: 0.06,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={dragonite}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "28%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "clamp(110px, 13vw, 160px)",
+          height: "clamp(110px, 13vw, 160px)",
+          opacity: 0.05,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={gyarados}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          bottom: "45%",
+          left: "8%",
+          width: "clamp(85px, 10vw, 135px)",
+          height: "clamp(85px, 10vw, 135px)",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={mewtwo}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          bottom: "50%",
+          right: "6%",
+          width: "clamp(90px, 11vw, 140px)",
+          height: "clamp(90px, 11vw, 140px)",
+          opacity: 0.06,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={mew}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "65%",
+          left: "5%",
+          width: "clamp(80px, 10vw, 130px)",
+          height: "clamp(80px, 10vw, 130px)",
+          opacity: 0.08,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <img
+        src={charizard}
+        alt=""
+        className="global-faded-pokemon"
+        style={{
+          position: "fixed",
+          top: "70%",
+          right: "7%",
+          width: "clamp(100px, 12vw, 150px)",
+          height: "clamp(100px, 12vw, 150px)",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
 
       {/* Floating Pokemon - Fixed at top of Home section */}
       <img
@@ -419,19 +670,15 @@ export default function App() {
               </button>
             </div>
 
+            {/* Animated Underline */}
             <div
-              className="absolute bottom-0 h-[3px] transition-all duration-500 ease-out"
+              className="absolute bottom-0 h-[3px] bg-gradient-to-r from-[#ff4343] via-[#ffd700] to-[#44a3f7] rounded-full transition-all duration-500 ease-out"
               style={{
                 left: underlineStyle.left + "px",
                 width: underlineStyle.width + "px",
+                boxShadow: "0 0 10px rgba(255, 215, 0, 0.6)",
               }}
-            >
-              <img
-                src={navUnderline}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </div>
+            />
           </div>
         </div>
 
@@ -471,33 +718,12 @@ export default function App() {
 
       <section
         id="home"
-        className="relative min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto flex items-center"
+        className="relative min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto flex items-center overflow-hidden"
       >
         <div className="relative w-full">
           <div className="relative z-10">
             <div className="flex flex-col items-center justify-center">
               <div className="genesis-wrapper-new relative mb-6 sm:mb-8">
-                <img
-                  src={pikachu}
-                  alt="Pikachu"
-                  className="pokemon-hero-deco pokemon-hero-1"
-                />
-                <img
-                  src={charmander}
-                  alt="Charmander"
-                  className="pokemon-hero-deco pokemon-hero-2"
-                />
-                <img
-                  src={squirtle}
-                  alt="Squirtle"
-                  className="pokemon-hero-deco pokemon-hero-3"
-                />
-                <img
-                  src={bulbasaur}
-                  alt="Bulbasaur"
-                  className="pokemon-hero-deco pokemon-hero-4"
-                />
-
                 <h1 className="genesis-logo-new">
                   GENESIS <span className="genesis-number-new">5</span>
                 </h1>
@@ -521,31 +747,79 @@ export default function App() {
               </button>
             </div>
 
-            {/* Countdown Timer - Below Register Button */}
-            <div className="mt-16 sm:mt-20 lg:mt-24 relative">
-              {/* Pokemon decorations in front */}
-              <img
-                src={jigglypuff}
-                alt="Jigglypuff"
-                className="countdown-pokemon countdown-pokemon-1"
-              />
-              <img
-                src={meowth}
-                alt="Meowth"
-                className="countdown-pokemon countdown-pokemon-2"
-              />
-              <img
-                src={psyduck}
-                alt="Psyduck"
-                className="countdown-pokemon countdown-pokemon-3"
-              />
-              <img
-                src={eevee}
-                alt="Eevee"
-                className="countdown-pokemon countdown-pokemon-4"
-              />
+            {/* Countdown Timer */}
+            <div className="mt-16 sm:mt-20 lg:mt-24 relative z-10">
+              <div className="countdown-container text-center relative overflow-visible">
+                {/* Pokemon positioned OUTSIDE container with higher z-index */}
+                <img
+                  src={jigglypuff}
+                  alt="Jigglypuff"
+                  className="absolute"
+                  style={{
+                    top: "-100px",
+                    left: "-80px",
+                    width: "clamp(100px, 14vw, 160px)",
+                    height: "clamp(100px, 14vw, 160px)",
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4))",
+                    animation: "bobFloat 4s ease-in-out infinite",
+                    animationDelay: "0s",
+                    zIndex: 100,
+                    pointerEvents: "none",
+                  }}
+                />
+                <img
+                  src={meowth}
+                  alt="Meowth"
+                  className="absolute"
+                  style={{
+                    top: "-90px",
+                    right: "-80px",
+                    width: "clamp(100px, 14vw, 160px)",
+                    height: "clamp(100px, 14vw, 160px)",
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4))",
+                    animation: "bobFloat 4s ease-in-out infinite",
+                    animationDelay: "-1s",
+                    zIndex: 100,
+                    pointerEvents: "none",
+                  }}
+                />
+                <img
+                  src={psyduck}
+                  alt="Psyduck"
+                  className="absolute"
+                  style={{
+                    bottom: "-100px",
+                    left: "8%",
+                    width: "clamp(100px, 14vw, 160px)",
+                    height: "clamp(100px, 14vw, 160px)",
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4))",
+                    animation: "bobFloat 4s ease-in-out infinite",
+                    animationDelay: "-2s",
+                    zIndex: 100,
+                    pointerEvents: "none",
+                  }}
+                />
+                <img
+                  src={togepi}
+                  alt="Togepi"
+                  className="absolute"
+                  style={{
+                    bottom: "-90px",
+                    right: "8%",
+                    width: "clamp(100px, 14vw, 160px)",
+                    height: "clamp(100px, 14vw, 160px)",
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4))",
+                    animation: "bobFloat 4s ease-in-out infinite",
+                    animationDelay: "-3s",
+                    zIndex: 100,
+                    pointerEvents: "none",
+                  }}
+                />
 
-              <div className="countdown-container text-center relative z-10">
                 <h2 className="countdown-title">EVENT COUNTDOWN</h2>
                 <p
                   className="text-base sm:text-lg lg:text-xl mb-4 sm:mb-6"
@@ -584,7 +858,7 @@ export default function App() {
         id="about"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-12 items-center">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-12 items-center relative z-10">
           <div className="w-full sm:w-4/5 lg:w-[500px] xl:w-[600px] flex-shrink-0">
             <img
               src={aboutImage}
@@ -640,7 +914,7 @@ export default function App() {
         id="prizes"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
-        <div className="text-center">
+        <div className="text-center relative z-10">
           <h2
             className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black mb-2 sm:mb-4"
             style={{ fontFamily: "'Londrina Solid', sans-serif" }}
@@ -655,19 +929,20 @@ export default function App() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-4 sm:gap-6 lg:gap-12 xl:gap-16 mt-8 sm:mt-12 lg:mt-16">
-          {/* 3rd Place */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-4 sm:gap-6 lg:gap-12 xl:gap-16 mt-8 sm:mt-12 lg:mt-16 relative z-10">
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4 relative">
-              <img src={prize3Circle} alt="" className="w-full h-full" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#cd7f32]/30 to-[#8b4513]/20 backdrop-blur-sm">
               <div
-                className="absolute inset-0 flex items-center justify-center text-[#05427b] font-bold text-sm sm:text-base"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+                className="text-white font-black text-xl sm:text-2xl z-20"
+                style={{
+                  fontFamily: "'Londrina Solid', sans-serif",
+                  textShadow: "0 2px 8px rgba(0, 0, 0, 0.7)",
+                }}
               >
                 3RD
               </div>
             </div>
-            <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[240px] lg:w-[260px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center">
+            <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[240px] lg:w-[260px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center shadow-lg">
               <p
                 className="text-4xl sm:text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
@@ -677,44 +952,44 @@ export default function App() {
             </div>
           </div>
 
-          {/* 1st Place */}
           <div className="flex flex-col items-center sm:-mt-4 lg:-mt-8">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4 relative">
-              <img src={prize1Circle} alt="" className="w-full h-full" />
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mb-3 sm:mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#ffd700]/40 to-[#ffed4e]/30 backdrop-blur-sm">
               <div
-                className="absolute inset-0 flex items-center justify-center text-[#05427b] font-bold text-base sm:text-lg"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+                className="text-white font-black text-2xl sm:text-3xl z-20"
+                style={{
+                  fontFamily: "'Londrina Solid', sans-serif",
+                  textShadow: "0 2px 8px rgba(0, 0, 0, 0.7)",
+                }}
               >
                 1ST
               </div>
             </div>
             <div className="relative w-[240px] sm:w-[280px] lg:w-[300px] h-[180px] sm:h-[210px] lg:h-[230px]">
-              <img
-                src={prize1Badge}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-              <p
-                className="absolute inset-0 flex items-center justify-center text-4xl sm:text-5xl lg:text-6xl xl:text-[96px] font-black text-white"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
-              >
-                17.5K
-              </p>
+              <div className="absolute inset-0 bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl shadow-xl"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p
+                  className="text-5xl sm:text-6xl lg:text-7xl xl:text-[100px] font-black text-[#05427b] z-20"
+                  style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+                >
+                  17.5K
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* 2nd Place */}
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4 relative">
-              <img src={prize2Circle} alt="" className="w-full h-full" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#c0c0c0]/30 to-[#a8a8a8]/20 backdrop-blur-sm">
               <div
-                className="absolute inset-0 flex items-center justify-center text-[#05427b] font-bold text-sm sm:text-base"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+                className="text-white font-black text-xl sm:text-2xl z-20"
+                style={{
+                  fontFamily: "'Londrina Solid', sans-serif",
+                  textShadow: "0 2px 8px rgba(0, 0, 0, 0.7)",
+                }}
               >
                 2ND
               </div>
             </div>
-            <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[242px] lg:w-[262px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center">
+            <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[242px] lg:w-[262px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center shadow-lg">
               <p
                 className="text-4xl sm:text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
@@ -731,13 +1006,13 @@ export default function App() {
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
         <h2
-          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black text-center mb-6 sm:mb-10 lg:mb-16"
+          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black text-center mb-6 sm:mb-10 lg:mb-16 relative z-10"
           style={{ fontFamily: "'Londrina Solid', sans-serif" }}
         >
           MEMORIES
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 max-w-5xl mx-auto relative z-10">
           {[1, 2, 3, 4, 5, 6].map((item) => (
             <div
               key={item}
@@ -752,70 +1027,77 @@ export default function App() {
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
       >
         <h2
-          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16"
+          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-black text-center mb-8 sm:mb-12 lg:mb-16 relative z-10"
           style={{ fontFamily: "'Londrina Solid', sans-serif" }}
         >
           FAQS
         </h2>
 
-        <div className="max-w-4xl mx-auto space-y-8">
-          {faqData.map((category, catIndex) => (
-            <div key={catIndex} className="space-y-4">
-              <h3
-                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#ffe14d] mb-4"
-                style={{ fontFamily: "'Londrina Solid', sans-serif" }}
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="flex flex-wrap gap-3 mb-8 justify-center">
+            {faqData.map((category, index) => (
+              <button
+                key={index}
+                onClick={() => handleCategoryChange(index)}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base lg:text-lg font-medium transition-all ${
+                  activeFaqCategory === index
+                    ? "bg-[#0f79c4] text-white shadow-lg shadow-blue-500/50"
+                    : "bg-[#1a1d3a] text-[#87c4ea] hover:bg-[#0f79c4]/20"
+                }`}
+                style={{ fontFamily: "'Cairo', sans-serif" }}
               >
                 {category.category}
-              </h3>
-              <div className="space-y-3">
-                {category.questions.map((item, qIndex) => {
-                  const key = `${catIndex}-${qIndex}`;
-                  const isOpen = openFaqIndex[key];
-                  return (
-                    <div
-                      key={qIndex}
-                      className="bg-gradient-to-r from-[#0a0e27]/80 to-[#1a1d3a]/80 border border-[#87c4ea]/30 rounded-xl overflow-hidden backdrop-blur-sm"
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            {faqData[activeFaqCategory].questions.map((item, qIndex) => {
+              const key = `${activeFaqCategory}-${qIndex}`;
+              const isOpen = openFaqIndex[key];
+              return (
+                <div
+                  key={qIndex}
+                  className="bg-gradient-to-r from-[#0a0e27]/80 to-[#1a1d3a]/80 border border-[#87c4ea]/30 rounded-xl overflow-hidden backdrop-blur-sm"
+                >
+                  <button
+                    onClick={() => toggleFaq(activeFaqCategory, qIndex)}
+                    className="w-full px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-[#87c4ea]/10 transition-colors"
+                  >
+                    <span
+                      className="text-left text-sm sm:text-base lg:text-lg text-white font-medium"
+                      style={{ fontFamily: "'Cairo', sans-serif" }}
                     >
-                      <button
-                        onClick={() => toggleFaq(catIndex, qIndex)}
-                        className="w-full px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-[#87c4ea]/10 transition-colors"
-                      >
-                        <span
-                          className="text-left text-sm sm:text-base lg:text-lg text-white font-medium"
-                          style={{ fontFamily: "'Cairo', sans-serif" }}
-                        >
-                          {item.q}
-                        </span>
-                        <svg
-                          className={`w-5 h-5 sm:w-6 sm:h-6 text-[#87c4ea] transition-transform flex-shrink-0 ml-4 ${
-                            isOpen ? "rotate-180" : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </button>
-                      {isOpen && (
-                        <div
-                          className="px-4 sm:px-6 pb-4 text-sm sm:text-base lg:text-lg text-[#87c4ea] leading-relaxed"
-                          style={{ fontFamily: "'Livvic', sans-serif" }}
-                        >
-                          {item.a}
-                        </div>
-                      )}
+                      {item.q}
+                    </span>
+                    <svg
+                      className={`w-5 h-5 sm:w-6 sm:h-6 text-[#87c4ea] transition-transform flex-shrink-0 ml-4 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div
+                      className="px-4 sm:px-6 pb-4 text-sm sm:text-base lg:text-lg text-[#87c4ea] leading-relaxed"
+                      style={{ fontFamily: "'Livvic', sans-serif" }}
+                    >
+                      {item.a}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -848,16 +1130,16 @@ export default function App() {
               </p>
               <div className="flex gap-4">
                 <img
-                  src={snorlax}
-                  alt="Snorlax"
+                  src={squirtle}
+                  alt="Squirtle"
                   className="w-16 h-16 object-contain opacity-80 hover:opacity-100 transition-opacity"
                   style={{
                     filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))",
                   }}
                 />
                 <img
-                  src={gengar}
-                  alt="Gengar"
+                  src={bulbasaur}
+                  alt="Bulbasaur"
                   className="w-16 h-16 object-contain opacity-80 hover:opacity-100 transition-opacity"
                   style={{
                     filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))",
@@ -933,33 +1215,33 @@ export default function App() {
                 style={{ fontFamily: "'Livvic', sans-serif" }}
               >
                 <li className="flex items-center gap-2">
-                  <span>📧</span>
-                  <a
-                    href="mailto:gdxr@example.com"
-                    className="hover:text-white transition-colors"
-                  >
-                    gdxr@example.com
-                  </a>
+                  <span>👤</span>
+                  <div>
+                    <div className="font-semibold text-white">Abhinav S</div>
+                    <a
+                      href="tel:+919778052399"
+                      className="hover:text-white transition-colors"
+                    >
+                      +91 9778052399
+                    </a>
+                  </div>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span>📱</span>
-                  <span>+91 XXXXX XXXXX</span>
+                  <span>👤</span>
+                  <div>
+                    <div className="font-semibold text-white">
+                      Aradhna Kumari
+                    </div>
+                    <a
+                      href="tel:+917050262224"
+                      className="hover:text-white transition-colors"
+                    >
+                      +91 7050262224
+                    </a>
+                  </div>
                 </li>
               </ul>
               <div className="mt-4 flex gap-3">
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-[#0f79c4] hover:bg-[#0d6aac] flex items-center justify-center transition-all hover:scale-110"
-                  aria-label="Discord"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
-                  </svg>
-                </a>
                 <a
                   href="https://www.instagram.com/gdxr_ait/"
                   className="w-10 h-10 rounded-full bg-[#0f79c4] hover:bg-[#0d6aac] flex items-center justify-center transition-all hover:scale-110"
@@ -971,19 +1253,6 @@ export default function App() {
                     viewBox="0 0 24 24"
                   >
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                  </svg>
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-[#0f79c4] hover:bg-[#0d6aac] flex items-center justify-center transition-all hover:scale-110"
-                  aria-label="Twitter"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                   </svg>
                 </a>
               </div>
