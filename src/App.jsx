@@ -121,6 +121,20 @@ const faqData = [
   },
 ];
 
+// Memory images data - Replace with your actual image paths
+const memorySlides = [
+  [
+    { id: 1, src: "/memories/mem1.jpg", alt: "Memory 1" },
+    { id: 2, src: "/memories/mem2.jpg", alt: "Memory 2" },
+    { id: 3, src: "/memories/mem3.jpg", alt: "Memory 3" },
+  ],
+  [
+    { id: 4, src: "/memories/mem4.jpg", alt: "Memory 4" },
+    { id: 5, src: "/memories/mem5.jpg", alt: "Memory 5" },
+    { id: 6, src: "/memories/mem6.jpg", alt: "Memory 6" },
+  ],
+];
+
 export default function App() {
   const [loading, setLoading] = React.useState(true);
   const [loadingFadeOut, setLoadingFadeOut] = React.useState(false);
@@ -143,23 +157,29 @@ export default function App() {
   const [activeFaqCategory, setActiveFaqCategory] = React.useState(0);
   const [openFaqIndex, setOpenFaqIndex] = React.useState({ "0-0": true });
 
+  // Memory Slider States
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = React.useState(true);
+  const [progress, setProgress] = React.useState(0);
+
   const navRefs = React.useRef({
     home: null,
     about: null,
     memories: null,
+    sponsors: null,
     faqs: null,
   });
   const floatingPokemonRef = React.useRef(null);
   const navButtonRef = React.useRef(null);
 
-  // Loading Screen Effect - REDUCED TO 9 SECONDS
+  // Loading Screen Effect
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setLoadingFadeOut(true);
       setTimeout(() => {
         setLoading(false);
       }, 800);
-    }, 9000); // Changed from 12000 to 9000
+    }, 9000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -192,6 +212,27 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Memory Slider Auto-play Effect
+  React.useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const duration = 5000; // 5 seconds per slide
+    const interval = 50; // Update progress every 50ms
+    let elapsed = 0;
+
+    const progressInterval = setInterval(() => {
+      elapsed += interval;
+      setProgress((elapsed / duration) * 100);
+
+      if (elapsed >= duration) {
+        nextSlide();
+        elapsed = 0;
+      }
+    }, interval);
+
+    return () => clearInterval(progressInterval);
+  }, [currentSlide, isAutoPlaying]);
+
   // Move floating Pokemon to nav button on hover
   const moveToNavButton = React.useCallback(() => {
     if (navButtonRef.current && floatingPokemonRef.current) {
@@ -216,7 +257,14 @@ export default function App() {
 
   // Active section detection based on scroll
   React.useEffect(() => {
-    const sections = ["home", "about", "prizes", "memories", "faqs"];
+    const sections = [
+      "home",
+      "about",
+      "prizes",
+      "memories",
+      "sponsors",
+      "faqs",
+    ];
     let ticking = false;
 
     const calcActive = () => {
@@ -312,6 +360,33 @@ export default function App() {
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setActiveSection("home");
+  };
+
+  // Memory Slider Functions
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % memorySlides.length);
+    setProgress(0);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + memorySlides.length) % memorySlides.length
+    );
+    setProgress(0);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+    setProgress(0);
+  };
+
+  const handleSliderMouseEnter = () => {
+    setIsAutoPlaying(false);
+  };
+
+  const handleSliderMouseLeave = () => {
+    setIsAutoPlaying(true);
+    setProgress(0);
   };
 
   if (loading) {
@@ -662,6 +737,13 @@ export default function App() {
                 Memories
               </button>
               <button
+                ref={(el) => (navRefs.current.sponsors = el)}
+                onClick={() => scrollToSection("sponsors")}
+                className="relative hover:opacity-80 transition-opacity py-2"
+              >
+                Sponsors
+              </button>
+              <button
                 ref={(el) => (navRefs.current.faqs = el)}
                 onClick={() => scrollToSection("faqs")}
                 className="relative hover:opacity-80 transition-opacity py-2"
@@ -704,6 +786,12 @@ export default function App() {
                 Memories
               </button>
               <button
+                onClick={() => scrollToSection("sponsors")}
+                className="block w-full text-left px-4 py-2 text-lg hover:bg-gray-900 rounded"
+              >
+                Sponsors
+              </button>
+              <button
                 onClick={() => scrollToSection("faqs")}
                 className="block w-full text-left px-4 py-2 text-lg hover:bg-gray-900 rounded"
               >
@@ -716,6 +804,7 @@ export default function App() {
         <div className="h-[3px] sm:h-[4px] bg-[#87c4ea]" />
       </nav>
 
+      {/* Home Section */}
       <section
         id="home"
         className="relative min-h-screen pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto flex items-center overflow-hidden"
@@ -854,6 +943,7 @@ export default function App() {
         </div>
       </section>
 
+      {/* About Section */}
       <section
         id="about"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
@@ -910,6 +1000,7 @@ export default function App() {
         </div>
       </section>
 
+      {/* Prizes Section */}
       <section
         id="prizes"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
@@ -1004,6 +1095,7 @@ export default function App() {
         </div>
       </section>
 
+      {/* UPDATED MEMORIES SECTION WITH SLIDER */}
       <section
         id="memories"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
@@ -1015,16 +1107,143 @@ export default function App() {
           MEMORIES
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 max-w-5xl mx-auto relative z-10">
-          {[1, 2, 3, 4, 5, 6].map((item) => (
+        <div
+          className="memory-slider-container relative z-10"
+          onMouseEnter={handleSliderMouseEnter}
+          onMouseLeave={handleSliderMouseLeave}
+        >
+          {/* Slider Wrapper */}
+          <div
+            className="memory-slider-wrapper"
+            style={{
+              transform: `translateX(-${currentSlide * 100}%)`,
+            }}
+          >
+            {memorySlides.map((slide, slideIndex) => (
+              <div key={slideIndex} className="memory-slide">
+                <div className="memory-slide-content">
+                  {slide.map((image) => (
+                    <div key={image.id} className="memory-image-wrapper">
+                      {/* Placeholder - Replace with actual images */}
+                      <div className="w-full h-full bg-[#d9d9d9] flex items-center justify-center text-gray-600 text-sm">
+                        Image {image.id}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={prevSlide}
+            className="memory-nav-arrow left"
+            aria-label="Previous slide"
+          >
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={nextSlide}
+            className="memory-nav-arrow right"
+            aria-label="Next slide"
+          >
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+
+          {/* Pagination Dots */}
+          <div className="memory-pagination">
+            {memorySlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`memory-dot ${
+                  index === currentSlide ? "active" : ""
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Progress Bar (Auto-play indicator) */}
+          {isAutoPlaying && (
             <div
-              key={item}
-              className="bg-[#d9d9d9] w-full h-[160px] sm:h-[180px] lg:h-[200px] rounded-lg hover:scale-105 transition-transform cursor-pointer"
+              className="memory-progress-bar"
+              style={{ width: `${progress}%` }}
             />
-          ))}
+          )}
         </div>
       </section>
 
+      {/* NEW SPONSORS SECTION */}
+      <section id="sponsors" className="sponsors-section">
+        {/* Decorative Pokemon */}
+        <img
+          src={pikachu}
+          alt=""
+          className="sponsors-deco-pokemon sponsors-deco-left"
+        />
+        <img
+          src={charmander}
+          alt=""
+          className="sponsors-deco-pokemon sponsors-deco-right"
+        />
+
+        <div className="sponsors-container">
+          <h2 className="sponsors-title">OUR SPONSORS</h2>
+
+          {/* Empty State - Remove this when adding actual sponsors */}
+          <div className="sponsors-empty-state">
+            <svg
+              className="sponsors-empty-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+            <p className="sponsors-empty-text">Sponsor Showcase Coming Soon!</p>
+            <p className="sponsors-empty-subtext">
+              Interested in sponsoring Genesis 5? Contact us to partner with
+              innovation.
+            </p>
+          </div>
+
+          {/* Uncomment this grid when adding sponsor logos */}
+          {/* 
+          <div className="sponsors-grid">
+            <div className="sponsor-card">
+              <img src="/sponsors/sponsor1.png" alt="Sponsor 1" />
+            </div>
+            <div className="sponsor-card">
+              <img src="/sponsors/sponsor2.png" alt="Sponsor 2" />
+            </div>
+            Add more sponsor cards as needed
+          </div>
+          */}
+        </div>
+      </section>
+
+      {/* FAQs Section */}
       <section
         id="faqs"
         className="relative min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-[1440px] mx-auto"
