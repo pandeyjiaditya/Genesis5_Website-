@@ -929,9 +929,10 @@ export default function App() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-4 sm:gap-6 lg:gap-12 xl:gap-16 mt-8 sm:mt-12 lg:mt-16 relative z-10">
+        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16 mt-12 sm:mt-16 lg:mt-20 relative z-10">
+          {/* 3rd Place */}
           <div className="flex flex-col items-center">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#cd7f32]/30 to-[#8b4513]/20 backdrop-blur-sm">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#cd7f32]/30 to-[#8b4513]/20 backdrop-blur-sm winner-badge">
               <div
                 className="text-white font-black text-xl sm:text-2xl z-20"
                 style={{
@@ -942,9 +943,9 @@ export default function App() {
                 3RD
               </div>
             </div>
-            <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[240px] lg:w-[260px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center shadow-lg">
+            <div className="prize-box bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[240px] lg:w-[260px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center shadow-lg">
               <p
-                className="text-4xl sm:text-5xl font-black text-[#05427b]"
+                className="prize-amount text-4xl sm:text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
               >
                 12.5K
@@ -952,8 +953,9 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center sm:-mt-4 lg:-mt-8">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mb-3 sm:mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#ffd700]/40 to-[#ffed4e]/30 backdrop-blur-sm">
+          {/* 1st Place - Elevated */}
+          <div className="flex flex-col items-center sm:-mt-8 lg:-mt-12">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#ffd700]/40 to-[#ffed4e]/30 backdrop-blur-sm winner-badge">
               <div
                 className="text-white font-black text-2xl sm:text-3xl z-20"
                 style={{
@@ -964,11 +966,11 @@ export default function App() {
                 1ST
               </div>
             </div>
-            <div className="relative w-[240px] sm:w-[280px] lg:w-[300px] h-[180px] sm:h-[210px] lg:h-[230px]">
+            <div className="prize-box relative w-[240px] sm:w-[280px] lg:w-[300px] h-[180px] sm:h-[210px] lg:h-[230px]">
               <div className="absolute inset-0 bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl shadow-xl"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <p
-                  className="text-5xl sm:text-6xl lg:text-7xl xl:text-[100px] font-black text-[#05427b] z-20"
+                  className="prize-amount text-5xl sm:text-6xl lg:text-7xl xl:text-[100px] font-black text-[#05427b] z-20"
                   style={{ fontFamily: "'Londrina Solid', sans-serif" }}
                 >
                   17.5K
@@ -977,8 +979,9 @@ export default function App() {
             </div>
           </div>
 
+          {/* 2nd Place */}
           <div className="flex flex-col items-center">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-3 sm:mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#c0c0c0]/30 to-[#a8a8a8]/20 backdrop-blur-sm">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-4 relative flex items-center justify-center bg-gradient-to-br from-[#c0c0c0]/30 to-[#a8a8a8]/20 backdrop-blur-sm winner-badge">
               <div
                 className="text-white font-black text-xl sm:text-2xl z-20"
                 style={{
@@ -989,9 +992,9 @@ export default function App() {
                 2ND
               </div>
             </div>
-            <div className="bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[242px] lg:w-[262px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center shadow-lg">
+            <div className="prize-box bg-white border-[2px] sm:border-[3px] border-[#5a9dd7] rounded-2xl sm:rounded-3xl w-[200px] sm:w-[242px] lg:w-[262px] h-[150px] sm:h-[180px] lg:h-[200px] flex items-center justify-center shadow-lg">
               <p
-                className="text-4xl sm:text-5xl font-black text-[#05427b]"
+                className="prize-amount text-4xl sm:text-5xl font-black text-[#05427b]"
                 style={{ fontFamily: "'Londrina Solid', sans-serif" }}
               >
                 15K
