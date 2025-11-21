@@ -1113,13 +1113,13 @@ export default function App() {
                   className="text-blue-200 text-sm leading-relaxed"
                   style={{ fontFamily: "'Livvic', sans-serif" }}
                 >
-                  GDXR Club VIT Bhopal presents Genesis 5 - The ultimate game
+                  AR-VR Club AIT Pune presents Genesis 5 - The ultimate game
                   development hackathon.
                 </p>
                 <div className="mt-6 flex space-x-4">
                   {/* Social Media Links */}
                   <a
-                    href="https://instagram.com/gdxr_vitb"
+                    href="https://www.instagram.com/gdxr_ait/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all duration-300"
@@ -1133,7 +1133,7 @@ export default function App() {
                     </svg>
                   </a>
                   <a
-                    href="https://www.instagram.com/gdxr_ait/"
+                    href="https://www.linkedin.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all duration-300"
