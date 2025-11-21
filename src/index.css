@@ -107,7 +107,7 @@ section > * {
 }
 
 /* ============================================ */
-/* GENESIS 5 POKEMON-THEMED TEXT - STATIC */
+/* GENESIS 5 TEXT - FADE UP ANIMATION */
 /* ============================================ */
 
 .genesis-3d-container {
@@ -123,6 +123,10 @@ section > * {
 .genesis-3d-wrapper-static {
   position: relative;
   display: inline-block;
+  /* Start hidden and lower */
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeUpGenesis 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
 }
 
 .genesis-3d-text-static {
@@ -154,6 +158,33 @@ section > * {
   background-clip: text !important;
   text-shadow: 4px 4px 0px #0652ba, 8px 8px 0px #023768, 12px 12px 0px #001f3f !important;
   filter: drop-shadow(0 0 30px rgba(255, 203, 5, 0.9)) !important;
+  /* Individual letter fade-up animation */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUpLetter 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Stagger delay for each letter */
+.genesis-letter-static:nth-child(1) {
+  animation-delay: 0.5s;
+}
+.genesis-letter-static:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.genesis-letter-static:nth-child(3) {
+  animation-delay: 0.7s;
+}
+.genesis-letter-static:nth-child(4) {
+  animation-delay: 0.8s;
+}
+.genesis-letter-static:nth-child(5) {
+  animation-delay: 0.9s;
+}
+.genesis-letter-static:nth-child(6) {
+  animation-delay: 1s;
+}
+.genesis-letter-static:nth-child(7) {
+  animation-delay: 1.1s;
 }
 
 .genesis-space {
@@ -178,8 +209,13 @@ section > * {
   font-size: 1.4em !important;
   text-shadow: 5px 5px 0px #0652ba, 10px 10px 0px #023768, 15px 15px 0px #001f3f !important;
   filter: drop-shadow(0 0 40px rgba(255, 107, 107, 1)) !important;
+  /* Special animation for number with scale */
+  opacity: 0;
+  transform: translateY(30px) scale(0.8);
+  animation: fadeUpNumber 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
 }
 
+/* Background glow fade-in */
 .genesis-3d-wrapper-static::before {
   content: "";
   position: absolute;
@@ -197,9 +233,65 @@ section > * {
   border-radius: 50%;
   z-index: -1;
   filter: blur(40px);
+  opacity: 0;
+  animation: glowFadeIn 1.5s ease-out 0.8s forwards;
 }
 
-/* Responsive Genesis */
+/* ============================================ */
+/* FADE-UP ANIMATIONS */
+/* ============================================ */
+
+@keyframes fadeUpGenesis {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUpLetter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUpNumber {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+  }
+  60% {
+    transform: translateY(-5px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes glowFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ============================================ */
+/* RESPONSIVE GENESIS */
+/* ============================================ */
+
 @media (max-width: 1200px) {
   .genesis-3d-text-static {
     font-size: clamp(3rem, 11vw, 8rem) !important;
@@ -234,6 +326,20 @@ section > * {
     text-shadow: 3px 3px 0px #0652ba, 6px 6px 0px #023768, 9px 9px 0px #001f3f !important;
     filter: drop-shadow(0 0 30px rgba(255, 107, 107, 0.9)) !important;
   }
+
+  /* Faster animation on mobile */
+  .genesis-3d-wrapper-static {
+    animation-duration: 0.9s;
+  }
+
+  .genesis-letter-static {
+    animation-duration: 0.6s;
+  }
+
+  .genesis-number-static {
+    animation-duration: 0.6s;
+    animation-delay: 0.9s;
+  }
 }
 
 @media (max-width: 480px) {
@@ -260,6 +366,29 @@ section > * {
   .genesis-space {
     width: clamp(6px, 1.5vw, 12px);
   }
+
+  /* Even faster on small screens */
+  .genesis-letter-static:nth-child(1) {
+    animation-delay: 0.3s;
+  }
+  .genesis-letter-static:nth-child(2) {
+    animation-delay: 0.4s;
+  }
+  .genesis-letter-static:nth-child(3) {
+    animation-delay: 0.5s;
+  }
+  .genesis-letter-static:nth-child(4) {
+    animation-delay: 0.6s;
+  }
+  .genesis-letter-static:nth-child(5) {
+    animation-delay: 0.7s;
+  }
+  .genesis-letter-static:nth-child(6) {
+    animation-delay: 0.8s;
+  }
+  .genesis-letter-static:nth-child(7) {
+    animation-delay: 0.9s;
+  }
 }
 
 @media (max-width: 360px) {
@@ -280,6 +409,18 @@ section > * {
 
   .genesis-3d-text-static {
     font-size: clamp(2.2rem, 8vw, 5rem) !important;
+  }
+}
+
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .genesis-3d-wrapper-static,
+  .genesis-letter-static,
+  .genesis-number-static,
+  .genesis-3d-wrapper-static::before {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -1483,7 +1624,6 @@ nav.scrolled,
   background: linear-gradient(90deg, #ffd700, #ffed4e);
   transition: width 0.4s ease;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-  border-radius: 2px;
 }
 
 .nav-link.active::after,
@@ -1628,7 +1768,7 @@ button {
 .simple-loading-screen {
   background: linear-gradient(
     135deg,
-     rgba(22, 57, 80, 0.95) 0%,
+    rgba(22, 57, 80, 0.95) 0%,
     rgba(38, 115, 162, 0.95) 25%,
     rgba(13, 44, 185, 0.95) 50%,
     rgba(23, 143, 167, 0.95) 75%,
