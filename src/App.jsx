@@ -7,9 +7,10 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./index.css";
 import { FadeInSection } from "./components/FadeInSection";
+import PokemonBackground from "./components/PokemonBackground";
 
 const aboutImage = "/character1.png";
-const navPokemon = "/nav.png";
+const navPokemon = "/logo.png";
 const logo = "/logo.png";
 
 const pikachu =
@@ -372,9 +373,7 @@ export default function App() {
       {/* NAVIGATION BAR */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-          navScrolled
-            ? "bg-[#0a0e27]/95 backdrop-blur-lg shadow-lg shadow-blue-500/10"
-            : "bg-transparent"
+          navScrolled ? "nav-scrolled" : ""
         }`}
       >
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -400,9 +399,7 @@ export default function App() {
                   key={item.id}
                   onClick={() => scrollToSection(item.ref, item.id)}
                   className={`nav-link text-base font-semibold ${
-                    activeSection === item.id
-                      ? "active text-yellow-400"
-                      : "text-white"
+                    activeSection === item.id ? "active" : ""
                   }`}
                   style={{ fontFamily: "'Cairo', sans-serif" }}
                 >
@@ -415,11 +412,10 @@ export default function App() {
             <div className="hidden md:block">
               <button
                 onClick={handleRegisterClick}
-                className="relative overflow-hidden bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2.5 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-yellow-400/50 hover:scale-105 group"
+                className="register-button px-6 py-2.5 rounded-full font-bold transition-all duration-300"
                 style={{ fontFamily: "'Livvic', sans-serif" }}
               >
-                <span className="relative z-10">Register Now</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                Register Now
               </button>
             </div>
 
@@ -457,14 +453,11 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile Menu with smooth animation */}
+        {/* Mobile Menu */}
         <div
           className={`mobile-menu md:hidden transition-all duration-500 ease-out ${
-            mobileMenuOpen
-              ? "open max-h-screen opacity-100"
-              : "closed max-h-0 opacity-0"
+            mobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
           }`}
-          style={{ backgroundColor: "rgba(10, 14, 39, 0.98)" }}
         >
           <div className="px-4 py-6 space-y-4">
             {[
@@ -477,9 +470,9 @@ export default function App() {
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.ref, item.id)}
-                className={`block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:translate-x-2 ${
+                className={`block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 ${
                   activeSection === item.id
-                    ? "bg-yellow-400 text-black"
+                    ? "bg-yellow-400 text-[#2d5016]"
                     : "text-white hover:bg-white/10"
                 }`}
                 style={{
@@ -492,7 +485,7 @@ export default function App() {
             ))}
             <button
               onClick={handleRegisterClick}
-              className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-yellow-400/50"
+              className="register-button w-full px-6 py-3 rounded-full font-bold transition-all duration-300"
               style={{ fontFamily: "'Livvic', sans-serif" }}
             >
               Register Now
@@ -501,22 +494,8 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Pokemon decoration with smooth entrance */}
-      {navScrolled && (
-        <motion.img
-          initial={{ opacity: 0, scale: 0, rotate: -180 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{
-            duration: 0.6,
-            ease: [0.4, 0, 0.2, 1],
-            type: "spring",
-            stiffness: 100,
-          }}
-          src={navPokemon}
-          alt=""
-          className="fixed top-4 right-4 w-16 h-16 z-40 animate-bounce pointer-events-none hidden lg:block"
-        />
-      )}
+      {/* POKEMON ANIMATED BACKGROUND - ADD THIS */}
+      <PokemonBackground />
 
       {/* HOME SECTION - GENESIS 5 Title NOT Animated */}
       <section
@@ -1380,6 +1359,40 @@ export default function App() {
           </div>
         </footer>
       </FadeInSection>
+
+      {/* Floating Pokémon - Add this div inside the main return */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.img
+          src={pikachu}
+          alt=""
+          className="absolute w-20 h-20 opacity-20"
+          style={{ top: "10%", right: "10%" }}
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 10, -10, 0],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.img
+          src={eevee}
+          alt=""
+          className="absolute w-24 h-24 opacity-20"
+          style={{ bottom: "20%", left: "5%" }}
+          animate={{
+            y: [0, 15, 0],
+            x: [0, 10, 0],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </div>
     </div>
   );
 }
