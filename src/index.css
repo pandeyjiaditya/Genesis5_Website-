@@ -1830,3 +1830,63 @@ button {
   transform: translateY(-2px) scale(1.05) !important;
   border-color: rgba(255, 215, 0, 0.8);
 }
+
+/* Add these at the very end of your CSS file */
+
+/* ============================================ */
+/* AUDIO CONTROL BUTTON STYLES */
+/* ============================================ */
+
+button[aria-label*="audio"] {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 50;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button[aria-label*="audio"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5) !important;
+}
+
+button[aria-label*="audio"]:active {
+  transform: scale(1.05);
+}
+
+/* Pulse animation when audio is playing */
+@keyframes audioPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
+  }
+}
+
+/* Notification animation */
+@keyframes notificationBounce {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  button[aria-label*="audio"] {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  button[aria-label*="audio"] svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}

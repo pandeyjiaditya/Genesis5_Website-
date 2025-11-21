@@ -199,6 +199,11 @@ export default function App() {
   const memoriesRef = useRef(null);
   const faqsRef = useRef(null);
 
+  // ADD THESE NEW AUDIO STATES
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [audioLoaded, setAudioLoaded] = useState(false);
+  const audioRef = useRef(null);
+
   // Loading Screen
   useEffect(() => {
     const duration = 3000;
@@ -302,6 +307,63 @@ export default function App() {
     };
   }, [loading]); // Add loading as dependency
 
+  // AUTO-PLAY audio after loading - NO EVENT LISTENERS
+  useEffect(() => {
+    if (!loading && audioLoaded) {
+      const timer = setTimeout(() => {
+        if (audioRef.current) {
+          // FORCE UNMUTE
+          audioRef.current.muted = false;
+          audioRef.current.volume = 0.3;
+
+          // Try multiple times
+          let attempts = 0;
+          const tryPlay = () => {
+            if (attempts >= 5) return; // Max 5 attempts
+
+            audioRef.current
+              .play()
+              .then(() => {
+                console.log("🎵 Pokemon music playing! Attempt:", attempts + 1);
+                setAudioPlaying(true);
+              })
+              .catch((error) => {
+                console.log(
+                  `⚠️ Attempt ${attempts + 1} failed:`,
+                  error.message
+                );
+                attempts++;
+                setTimeout(tryPlay, 500); // Retry after 500ms
+              });
+          };
+
+          tryPlay();
+        }
+      }, 800); // Start audio 800ms after loading completes
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, audioLoaded]);
+
+  // Audio toggle function
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (audioPlaying) {
+        audioRef.current.pause();
+        setAudioPlaying(false);
+        console.log("🔇 Audio paused");
+      } else {
+        audioRef.current
+          .play()
+          .then(() => {
+            setAudioPlaying(true);
+            console.log("🔊 Audio playing");
+          })
+          .catch((err) => console.error("Audio play error:", err));
+      }
+    }
+  };
+
   const handleRegisterClick = () => {
     window.open(
       "https://unstop.com/o/iuvm4BM?lb=XXQIl8jQ&utm_medium=Share&utm_source=pankacha9021&utm_campaign=Online_coding_challenge",
@@ -370,6 +432,122 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen">
+      {/* AUDIO ELEMENT - Add this right after opening div */}
+      <audio
+        ref={audioRef}
+        loop
+        preload="auto"
+        autoPlay
+        muted={false}
+        onLoadedData={() => {
+          console.log("✅ Audio file loaded successfully!");
+          setAudioLoaded(true);
+        }}
+        onError={(e) => {
+          console.error("❌ Audio loading error:", e.target.error);
+        }}
+        onPlay={() => {
+          console.log("🎵 Audio started playing!");
+          setAudioPlaying(true);
+        }}
+        onPause={() => {
+          console.log("⏸️ Audio paused!");
+          setAudioPlaying(false);
+        }}
+      >
+        {/* Your local audio file in public folder */}
+        <source src="/pokemon_song.mp3" type="audio/mpeg" />
+        {/* Fallback formats */}
+        <source src="/pokemon_song.ogg" type="audio/ogg" />
+        <source src="/pokemon_song.wav" type="audio/wav" />
+      </audio>
+
+      {/* AUDIO CONTROL BUTTON - Fixed position */}
+      {!loading && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+          onClick={toggleAudio}
+          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg hover:shadow-yellow-400/50 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+          aria-label={audioPlaying ? "Mute audio" : "Play audio"}
+          style={{
+            border: "2px solid rgba(255, 215, 0, 0.5)",
+          }}
+        >
+          {audioPlaying ? (
+            // Volume On Icon
+            <svg
+              className="w-6 h-6 text-[#2d5016]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+              />
+            </svg>
+          ) : (
+            // Volume Off Icon
+            <svg
+              className="w-6 h-6 text-[#2d5016]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
+              />
+            </svg>
+          )}
+
+          {/* Tooltip */}
+          <span className="absolute bottom-full mb-2 px-3 py-1 bg-black/80 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {audioPlaying ? "Mute Music 🔇" : "Play Music 🔊"}
+          </span>
+
+          {/* Animated sound waves when playing */}
+          {audioPlaying && (
+            <>
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-yellow-400 pointer-events-none"
+                animate={{
+                  scale: [1, 1.4, 1.4],
+                  opacity: [0.6, 0, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                }}
+              />
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-yellow-400 pointer-events-none"
+                animate={{
+                  scale: [1, 1.4, 1.4],
+                  opacity: [0.6, 0, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                  delay: 0.7,
+                }}
+              />
+            </>
+          )}
+        </motion.button>
+      )}
+
+      {/* POKEMON ANIMATED BACKGROUND */}
+      <PokemonBackground />
+
       {/* NAVIGATION BAR */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
@@ -493,9 +671,6 @@ export default function App() {
           </div>
         </div>
       </nav>
-
-      {/* POKEMON ANIMATED BACKGROUND - ADD THIS */}
-      <PokemonBackground />
 
       {/* HOME SECTION - GENESIS 5 Title NOT Animated */}
       <section
