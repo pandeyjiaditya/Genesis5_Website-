@@ -1095,3 +1095,181 @@ img {
     padding-bottom: clamp(40px, 8vw, 60px) !important;
   }
 }
+
+/* ============================================ */
+/* SMOOTH NAVBAR UNDERLINE ANIMATION */
+/* ============================================ */
+
+.nav-link {
+  position: relative;
+  display: inline-block;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Smooth navbar background transition */
+nav {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile menu smooth slide */
+.mobile-menu {
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+}
+
+.mobile-menu.open {
+  transform: scaleY(1);
+}
+
+.mobile-menu.closed {
+  transform: scaleY(0);
+}
+
+/* Smooth section transitions */
+section {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================ */
+/* ENHANCED SWIPER ANIMATIONS */
+/* ============================================ */
+
+.swiper-slide {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.swiper-slide-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.swiper-slide-prev,
+.swiper-slide-next {
+  transform: scale(0.95);
+  opacity: 0.7;
+}
+
+/* Memory slider smooth transitions */
+.memory-slider-wrapper {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.memory-nav-arrow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.memory-nav-arrow:hover {
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 8px 25px rgba(255, 237, 77, 0.4);
+}
+
+.memory-nav-arrow:active {
+  transform: translateY(-50%) scale(1.05);
+}
+
+.memory-dot {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.memory-dot:hover {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+
+.memory-image-container {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.memory-image-container:hover {
+  transform: scale(1.08) rotate(2deg);
+}
+
+.memory-overlay {
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================ */
+/* SMOOTH BUTTON HOVER EFFECTS */
+/* ============================================ */
+
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* FAQ smooth expand/collapse */
+.faq-answer {
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* ============================================ */
+/* LOADING SCREEN FADE OUT */
+/* ============================================ */
+
+.simple-loading-screen {
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.simple-loading-screen.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* ============================================ */
+/* POKEMON DECORATIONS SMOOTH ANIMATIONS */
+/* ============================================ */
+
+.pokemon-hero-deco,
+.countdown-pokemon,
+.sponsors-deco-pokemon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pokemon-hero-deco:hover,
+.countdown-pokemon:hover,
+.sponsors-deco-pokemon:hover {
+  transform: scale(1.15) rotate(5deg);
+}

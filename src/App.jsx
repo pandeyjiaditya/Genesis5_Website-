@@ -254,6 +254,8 @@ export default function App() {
 
   // Section detection for active nav link
   useEffect(() => {
+    if (loading) return; // Don't observe while loading
+
     const sections = [
       { ref: homeRef, name: "home" },
       { ref: aboutRef, name: "about" },
@@ -262,28 +264,42 @@ export default function App() {
       { ref: faqsRef, name: "faqs" },
     ];
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const section = sections.find(
-              (s) => s.ref.current === entry.target
-            );
-            if (section) {
-              setActiveSection(section.name);
-            }
+    const observerOptions = {
+      root: null,
+      rootMargin: "-20% 0px -60% 0px", // Top 20% of viewport triggers active state
+      threshold: 0,
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const section = sections.find((s) => s.ref.current === entry.target);
+          if (section) {
+            setActiveSection(section.name);
           }
-        });
-      },
-      { threshold: 0.5 }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions
     );
 
     sections.forEach(({ ref }) => {
-      if (ref.current) observer.observe(ref.current);
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
     });
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      sections.forEach(({ ref }) => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [loading]); // Add loading as dependency
 
   const handleRegisterClick = () => {
     window.open(
@@ -309,38 +325,7 @@ export default function App() {
     setOpenFaqIndex({ [`${index}-0`]: true });
   };
 
-  // Update navScrolled state on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setNavScrolled(scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Smooth scroll to section
-  const handleNavLinkClick = (section) => {
-    setActiveSection(section);
-    setMobileMenuOpen(false);
-
-    const element = {
-      home: homeRef,
-      about: aboutRef,
-      prizes: prizesRef,
-      memories: memoriesRef,
-      faqs: faqsRef,
-    }[section]?.current;
-
-    if (element) {
-      window.scrollTo({
-        top: element.offsetTop - 100,
-        behavior: "smooth",
-      });
-    }
-  };
-
   const scrollToSection = (sectionRef, sectionName) => {
     if (sectionRef.current) {
       const yOffset = -80;
@@ -348,8 +333,18 @@ export default function App() {
         sectionRef.current.getBoundingClientRect().top +
         window.pageYOffset +
         yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-      setActiveSection(sectionName);
+
+      // Use smooth scroll with custom easing
+      window.scrollTo({
+        top: y,
+        behavior: "smooth",
+      });
+
+      // Update active section with slight delay for smooth transition
+      setTimeout(() => {
+        setActiveSection(sectionName);
+      }, 100);
+
       setMobileMenuOpen(false);
     }
   };
@@ -376,9 +371,9 @@ export default function App() {
     <div className="relative min-h-screen">
       {/* NAVIGATION BAR */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
           navScrolled
-            ? "bg-[#0a0e27]/95 backdrop-blur-lg shadow-lg"
+            ? "bg-[#0a0e27]/95 backdrop-blur-lg shadow-lg shadow-blue-500/10"
             : "bg-transparent"
         }`}
       >
@@ -386,7 +381,7 @@ export default function App() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div
-              className="flex-shrink-0 cursor-pointer"
+              className="flex-shrink-0 cursor-pointer transform transition-transform duration-300 hover:scale-110"
               onClick={() => scrollToSection(homeRef, "home")}
             >
               <img src={logo} alt="GDXR Logo" className="h-12 w-auto" />
@@ -404,17 +399,14 @@ export default function App() {
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.ref, item.id)}
-                  className={`text-base font-semibold transition-all duration-300 relative ${
+                  className={`nav-link text-base font-semibold ${
                     activeSection === item.id
-                      ? "text-yellow-400"
-                      : "text-white hover:text-yellow-400"
+                      ? "active text-yellow-400"
+                      : "text-white"
                   }`}
                   style={{ fontFamily: "'Cairo', sans-serif" }}
                 >
                   {item.name}
-                  {activeSection === item.id && (
-                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-400"></span>
-                  )}
                 </button>
               ))}
             </div>
@@ -423,22 +415,23 @@ export default function App() {
             <div className="hidden md:block">
               <button
                 onClick={handleRegisterClick}
-                className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2.5 rounded-full font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-yellow-400/50"
+                className="relative overflow-hidden bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2.5 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-yellow-400/50 hover:scale-105 group"
                 style={{ fontFamily: "'Livvic', sans-serif" }}
               >
-                Register Now
+                <span className="relative z-10">Register Now</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-all duration-300"
               aria-label="Toggle menu"
             >
               <svg
-                className={`w-6 h-6 text-white transition-transform duration-300 ${
-                  mobileMenuOpen ? "rotate-90" : ""
+                className={`w-6 h-6 text-white transition-all duration-300 ${
+                  mobileMenuOpen ? "rotate-90 scale-110" : ""
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -464,10 +457,12 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu with smooth animation */}
         <div
-          className={`md:hidden transition-all duration-300 overflow-hidden ${
-            mobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+          className={`mobile-menu md:hidden transition-all duration-500 ease-out ${
+            mobileMenuOpen
+              ? "open max-h-screen opacity-100"
+              : "closed max-h-0 opacity-0"
           }`}
           style={{ backgroundColor: "rgba(10, 14, 39, 0.98)" }}
         >
@@ -478,23 +473,26 @@ export default function App() {
               { name: "Prizes", ref: prizesRef, id: "prizes" },
               { name: "Memories", ref: memoriesRef, id: "memories" },
               { name: "FAQs", ref: faqsRef, id: "faqs" },
-            ].map((item) => (
+            ].map((item, index) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.ref, item.id)}
-                className={`block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                className={`block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:translate-x-2 ${
                   activeSection === item.id
                     ? "bg-yellow-400 text-black"
                     : "text-white hover:bg-white/10"
                 }`}
-                style={{ fontFamily: "'Cairo', sans-serif" }}
+                style={{
+                  fontFamily: "'Cairo', sans-serif",
+                  transitionDelay: `${index * 50}ms`,
+                }}
               >
                 {item.name}
               </button>
             ))}
             <button
               onClick={handleRegisterClick}
-              className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 shadow-lg"
+              className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-yellow-400/50"
               style={{ fontFamily: "'Livvic', sans-serif" }}
             >
               Register Now
@@ -503,9 +501,17 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Add Pokemon decoration to navbar on scroll */}
+      {/* Pokemon decoration with smooth entrance */}
       {navScrolled && (
-        <img
+        <motion.img
+          initial={{ opacity: 0, scale: 0, rotate: -180 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{
+            duration: 0.6,
+            ease: [0.4, 0, 0.2, 1],
+            type: "spring",
+            stiffness: 100,
+          }}
           src={navPokemon}
           alt=""
           className="fixed top-4 right-4 w-16 h-16 z-40 animate-bounce pointer-events-none hidden lg:block"
@@ -815,7 +821,7 @@ export default function App() {
 
               {/* 1st Place */}
               <FadeInSection delay={0.8} yOffset={80}>
-                <div className="prize-box relative bg-white/95 border-4 border-[#5a9dd7] rounded-3xl p-10 min-w-[320px] text-center shadow-2xl lg:scale-110">
+                <div className="prize-box relative bg-white/95 border-4 border-[#5a9dd7] rounded-2xl p-10 min-w-[320px] text-center shadow-2xl lg:scale-110">
                   <div className="prize-circle-bg prize-circle-gold"></div>
                   <div
                     className="winner-badge absolute -top-20 left-1/2 transform -translate-x-1/2 w-28 h-28 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-4xl font-black text-white shadow-2xl"
@@ -848,7 +854,7 @@ export default function App() {
 
               {/* 3rd Place */}
               <FadeInSection delay={1.0} yOffset={80}>
-                <div className="prize-box relative bg-white/95 border-4 border-[#5a9dd7] rounded-3xl p-8 min-w-[280px] text-center shadow-2xl">
+                <div className="prize-box relative bg-white/95 border-4 border-[#5a9dd7] rounded-2xl p-8 min-w-[280px] text-center shadow-2xl">
                   <div
                     className="absolute -top-16 left-1/2 transform -translate-x-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-3xl font-black text-white shadow-lg"
                     style={{ fontFamily: "'Londrina Solid', sans-serif" }}
@@ -920,10 +926,15 @@ export default function App() {
                 modules={[Navigation, Pagination, Autoplay]}
                 spaceBetween={0}
                 slidesPerView={1}
-                speed={800}
+                speed={1000} // Increased from 800 for smoother transitions
+                effect="fade" // Add fade effect
+                fadeEffect={{
+                  crossFade: true,
+                }}
                 autoplay={{
                   delay: 5000,
                   disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
                 }}
                 navigation={{
                   nextEl: ".memory-nav-arrow.right",
@@ -941,6 +952,10 @@ export default function App() {
                 onSlideChange={(swiper) => setCurrentSlide(swiper.activeIndex)}
                 onSwiper={(swiper) => (swiperRef.current = swiper)}
                 className="memory-slider-wrapper"
+                // Add smooth transition
+                cssMode={false}
+                grabCursor={true}
+                centeredSlides={true}
               >
                 {memorySlides.map((slide, slideIdx) => (
                   <SwiperSlide key={slideIdx} className="memory-slide">
@@ -1053,9 +1068,16 @@ export default function App() {
                 const key = `${activeFaqCategory}-${qIdx}`;
                 const isOpen = openFaqIndex[key];
                 return (
-                  <div
+                  <motion.div
                     key={qIdx}
-                    className="bg-gradient-to-r from-blue-900/30 to-blue-800/20 border-2 border-blue-400/30 rounded-2xl overflow-hidden transition-all duration-300 hover:border-blue-400/50"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: qIdx * 0.1,
+                      duration: 0.4,
+                      ease: [0.4, 0, 0.2, 1],
+                    }}
+                    className="bg-gradient-to-r from-blue-900/30 to-blue-800/20 border-2 border-blue-400/30 rounded-2xl overflow-hidden transition-all duration-300 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-400/20"
                   >
                     <button
                       onClick={() => toggleFaq(activeFaqCategory, qIdx)}
@@ -1067,10 +1089,10 @@ export default function App() {
                       >
                         {item.q}
                       </span>
-                      <svg
-                        className={`w-6 h-6 text-blue-300 transition-transform duration-300 flex-shrink-0 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
+                      <motion.svg
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                        className="w-6 h-6 text-blue-300 flex-shrink-0"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -1081,9 +1103,20 @@ export default function App() {
                           strokeWidth={2}
                           d="M19 9l-7 7-7-7"
                         />
-                      </svg>
+                      </motion.svg>
                     </button>
-                    {isOpen && (
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        height: isOpen ? "auto" : 0,
+                        opacity: isOpen ? 1 : 0,
+                      }}
+                      transition={{
+                        height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                        opacity: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+                      }}
+                      className="overflow-hidden"
+                    >
                       <div className="px-6 pb-6">
                         <p
                           className="text-blue-200 leading-relaxed"
@@ -1092,8 +1125,8 @@ export default function App() {
                           {item.a}
                         </p>
                       </div>
-                    )}
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 );
               })}
             </div>
