@@ -1071,6 +1071,12 @@ export default function App() {
                 alt: "Participants Group Photo",
               },
               { src: "/public/memories/10.jpg", alt: "Innovation Showcase" },
+              { src: "/public/memories/11.jpg", alt: "Innovation Showcase" },
+              { src: "/public/memories/12.jpg", alt: "Innovation Showcase" },
+              { src: "/public/memories/14.jpg", alt: "Innovation Showcase" },
+              { src: "/public/memories/18.jpg", alt: "Innovation Showcase" },
+              { src: "/public/memories/19.jpg", alt: "Innovation Showcase" },
+              { src: "/public/memories/22.jpg", alt: "Innovation Showcase" },
             ]}
             title="Genesis 4 Memories"
             subtitle="Relive the epic moments from our last adventure"
