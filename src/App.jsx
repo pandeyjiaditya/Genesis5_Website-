@@ -1053,30 +1053,30 @@ export default function App() {
           <MemoriesGallery
             images={[
               {
-                src: "/public/1.jpg",
+                src: "/1.jpg",
                 alt: "Opening Ceremony - Genesis 4",
               },
-              { src: "/public/2.jpg", alt: "Hackathon in Action" },
+              { src: "/2.jpg", alt: "Hackathon in Action" },
               {
-                src: "/public/3.jpg",
+                src: "/3.jpg",
                 alt: "Winner Team Celebration",
               },
-              { src: "/public/4.jpg", alt: "Mentor Sessions" },
-              { src: "/public/5.jpg", alt: "Closing Ceremony" },
-              { src: "/public/6.jpg", alt: "Team Collaboration" },
-              { src: "/public/7.jpg", alt: "Prize Distribution" },
-              { src: "/public/8.jpg", alt: "Gaming Setup" },
+              { src: "/4.jpg", alt: "Mentor Sessions" },
+              { src: "/5.jpg", alt: "Closing Ceremony" },
+              { src: "/6.jpg", alt: "Team Collaboration" },
+              { src: "/7.jpg", alt: "Prize Distribution" },
+              { src: "/8.jpg", alt: "Gaming Setup" },
               {
-                src: "/public/9.jpg",
+                src: "/9.jpg",
                 alt: "Participants Group Photo",
               },
-              { src: "/public/10.jpg", alt: "Innovation Showcase" },
-              { src: "/public/11.jpg", alt: "Innovation Showcase" },
-              { src: "/public/12.jpg", alt: "Innovation Showcase" },
-              { src: "/public/14.jpg", alt: "Innovation Showcase" },
-              { src: "/public/18.jpg", alt: "Innovation Showcase" },
-              { src: "/public/19.jpg", alt: "Innovation Showcase" },
-              { src: "/public/22.jpg", alt: "Innovation Showcase" },
+              { src: "/10.jpg", alt: "Innovation Showcase" },
+              { src: "/11.jpg", alt: "Innovation Showcase" },
+              { src: "/12.jpg", alt: "Innovation Showcase" },
+              { src: "/14.jpg", alt: "Innovation Showcase" },
+              { src: "/18.jpg", alt: "Innovation Showcase" },
+              { src: "/19.jpg", alt: "Innovation Showcase" },
+              { src: "/22.jpg", alt: "Innovation Showcase" },
             ]}
             title="Genesis 4 Memories"
             subtitle="Relive the epic moments from our last adventure"
