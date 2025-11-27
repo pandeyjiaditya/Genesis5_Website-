@@ -8,6 +8,7 @@ import "swiper/css/pagination";
 import "./index.css";
 import { FadeInSection } from "./components/FadeInSection";
 import PokemonBackground from "./components/PokemonBackground";
+import MemoriesGallery from "./components/MemoriesGallery";
 
 const aboutImage = "/character1.png";
 const navPokemon = "/logo.png";
@@ -1042,135 +1043,38 @@ export default function App() {
         </section>
       </FadeInSection>
 
-      {/* MEMORIES SECTION */}
+      {/* MEMORIES SECTION - NEW 3D GALLERY */}
       <FadeInSection>
         <section
           ref={memoriesRef}
           id="memories"
-          className="relative min-h-screen pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto"
+          className="relative min-h-screen pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20"
         >
-          <FadeInSection delay={0.2}>
-            <h2
-              className="text-center text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black mb-4"
-              style={{
-                fontFamily: "'Londrina Solid', sans-serif",
-                background:
-                  "linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Memories
-            </h2>
-          </FadeInSection>
-
-          <FadeInSection delay={0.4}>
-            <p
-              className="text-center text-lg sm:text-xl lg:text-2xl mb-12"
-              style={{ fontFamily: "'Livvic', sans-serif", color: "#87c4ea" }}
-            >
-              Relive the epic moments from Genesis 4
-            </p>
-          </FadeInSection>
-
-          <FadeInSection delay={0.6}>
-            <div className="memory-slider-container relative">
-              <Swiper
-                modules={[Navigation, Pagination, Autoplay]}
-                spaceBetween={0}
-                slidesPerView={1}
-                speed={1000} // Increased from 800 for smoother transitions
-                effect="fade" // Add fade effect
-                fadeEffect={{
-                  crossFade: true,
-                }}
-                autoplay={{
-                  delay: 5000,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
-                navigation={{
-                  nextEl: ".memory-nav-arrow.right",
-                  prevEl: ".memory-nav-arrow.left",
-                }}
-                pagination={{
-                  el: ".memory-pagination",
-                  clickable: true,
-                  renderBullet: (index, className) => {
-                    return `<button class="${className} memory-dot" aria-label="Go to slide ${
-                      index + 1
-                    }"></button>`;
-                  },
-                }}
-                onSlideChange={(swiper) => setCurrentSlide(swiper.activeIndex)}
-                onSwiper={(swiper) => (swiperRef.current = swiper)}
-                className="memory-slider-wrapper"
-                // Add smooth transition
-                cssMode={false}
-                grabCursor={true}
-                centeredSlides={true}
-              >
-                {memorySlides.map((slide, slideIdx) => (
-                  <SwiperSlide key={slideIdx} className="memory-slide">
-                    <div className="memory-collage-grid">
-                      {slide.map((img, imgIdx) => (
-                        <div
-                          key={img.id}
-                          className={`memory-collage-item memory-item-${
-                            imgIdx + 1
-                          }`}
-                        >
-                          <div className="memory-image-container">
-                            <img
-                              src={img.src}
-                              alt={img.alt}
-                              className="memory-image"
-                              loading="lazy"
-                            />
-                            <div className="memory-overlay">
-                              <span className="memory-label">
-                                Genesis Memory
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-
-              <button
-                className="memory-nav-arrow left"
-                aria-label="Previous slide"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <button
-                className="memory-nav-arrow right"
-                aria-label="Next slide"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-
-              <div className="memory-pagination"></div>
-            </div>
-          </FadeInSection>
+          <MemoriesGallery
+            images={[
+              {
+                src: "/public/memories/1.jpg",
+                alt: "Opening Ceremony - Genesis 4",
+              },
+              { src: "/public/memories/2.jpg", alt: "Hackathon in Action" },
+              {
+                src: "/public/memories/3.jpg",
+                alt: "Winner Team Celebration",
+              },
+              { src: "/public/memories/4.jpg", alt: "Mentor Sessions" },
+              { src: "/public/memories/5.jpg", alt: "Closing Ceremony" },
+              { src: "/public/memories/6.jpg", alt: "Team Collaboration" },
+              { src: "/public/memories/7.jpg", alt: "Prize Distribution" },
+              { src: "/public/memories/8.jpg", alt: "Gaming Setup" },
+              {
+                src: "/public/memories/9.jpg",
+                alt: "Participants Group Photo",
+              },
+              { src: "/public/memories/10.jpg", alt: "Innovation Showcase" },
+            ]}
+            title="Genesis 4 Memories"
+            subtitle="Relive the epic moments from our last adventure"
+          />
         </section>
       </FadeInSection>
 
