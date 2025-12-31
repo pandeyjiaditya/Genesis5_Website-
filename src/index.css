@@ -1284,6 +1284,7 @@ html {
 /* Smooth navbar background transition */
 nav {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
 }
 
 /* Mobile menu smooth slide */
@@ -1464,19 +1465,13 @@ section > .relative {
 /* Enhanced Navbar Styling */
 nav {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px);
+  backdrop-filter: none;
 }
 
 nav.scrolled {
-  background: linear-gradient(
-    135deg,
-    rgba(13, 27, 42, 0.95) 0%,
-    rgba(27, 38, 59, 0.95) 50%,
-    rgba(13, 27, 42, 0.95) 100%
-  );
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37),
-    0 0 20px rgba(255, 203, 5, 0.1);
-  border-bottom: 1px solid rgba(255, 203, 5, 0.2);
+  background: transparent;
+  box-shadow: none;
+  border-bottom: none;
 }
 
 /* Glassmorphism effect for sections */
@@ -1586,24 +1581,16 @@ section > .relative {
 
 nav {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(12px);
-  background: rgba(10, 14, 39, 0.3);
-  border-bottom: 1px solid rgba(91, 123, 180, 0.2);
+  backdrop-filter: none;
+  background: transparent;
+  border-bottom: none;
 }
 
 nav.scrolled,
 .nav-scrolled {
-  background: linear-gradient(
-    135deg,
-    rgba(22, 57, 80, 0.95) 0%,
-    rgba(38, 115, 162, 0.95) 25%,
-    rgba(13, 44, 185, 0.95) 50%,
-    rgba(23, 143, 167, 0.95) 75%,
-    rgba(9, 29, 96, 0.95) 100%
-  ) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(91, 166, 50, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-  border-bottom: 2px solid rgba(255, 237, 77, 0.3) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
 }
 
 /* Navbar Links */
